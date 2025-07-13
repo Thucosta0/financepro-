@@ -265,22 +265,6 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
         </button>
       </div>
 
-      {/* Aviso sobre sistema de premium */}
-      <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg">
-        <div className="flex items-start space-x-3">
-          <div className="text-purple-600 mt-0.5">👑</div>
-          <div>
-            <h5 className="text-sm font-medium text-purple-800">Sistema de Premium</h5>
-            <p className="text-xs text-purple-700 mt-1">
-              Conceda acesso premium gratuito aos usuários, liberando todas as funcionalidades sem necessidade de pagamento.
-            </p>
-            <p className="text-xs text-purple-600 mt-2">
-              <strong>Nota:</strong> O administrador (arthurcos33@gmail.com) não pode ter ações executadas sobre si mesmo por segurança.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Filtros */}
       <div className="flex items-center space-x-4">
         <div className="relative flex-1">
