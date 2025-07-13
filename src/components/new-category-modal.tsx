@@ -171,7 +171,7 @@ export function NewCategoryModal({ isOpen, onClose, editingCategory }: NewCatego
                     key={icon}
                     type="button"
                     onClick={() => setFormData({...formData, icon})}
-                    className={`p-2 text-xl border rounded-lg hover:bg-gray-50 ${
+                    className={`p-2 text-xl border rounded-lg hover:bg-gray-50 flex items-center justify-center ${
                       formData.icon === icon ? 'border-green-500 bg-green-50' : 'border-gray-300'
                     }`}
                   >
@@ -191,7 +191,7 @@ export function NewCategoryModal({ isOpen, onClose, editingCategory }: NewCatego
                     key={color}
                     type="button"
                     onClick={() => setFormData({...formData, color})}
-                    className={`w-8 h-8 rounded-full border-2 ${
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
                       formData.color === color ? 'border-gray-800 scale-110' : 'border-gray-300'
                     }`}
                     style={{ backgroundColor: color }}

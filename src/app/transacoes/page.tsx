@@ -7,6 +7,7 @@ import { useSubscription } from '@/hooks/use-subscription'
 import { NewTransactionModal } from '@/components/new-transaction-modal'
 import { EditTransactionModal } from '@/components/edit-transaction-modal'
 import { TransactionPrerequisitesGuide } from '@/components/transaction-prerequisites-guide'
+import { TransactionsList } from '@/components/transactions-list'
 import { useTransactionPrerequisites } from '@/hooks/use-transaction-prerequisites'
 import { ProtectedRoute } from '@/components/protected-route'
 import type { Transaction } from '@/lib/supabase-client'
@@ -810,260 +811,20 @@ export default function TransacoesPage() {
           </div>
         </div>
 
-        {/* Lista de Transações - Mobile-First */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          {transacoesFiltradas.length > 0 ? (
-            <div className="divide-y divide-gray-200">
-              {transacoesFiltradas.map((transacao) => (
-                <div key={transacao.id} className={`p-4 lg:p-6 transition-colors ${
-                  transacao.is_completed ? 'bg-green-50 hover:bg-green-100' : 'hover:bg-gray-50'
-                }`}>
-                  {/* Layout Mobile */}
-                  <div className="block lg:hidden">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-start space-x-3">
-                        {/* Checkbox */}
-                        {isSelectMode ? (
-                          <button
-                            onClick={() => handleSelectTransaction(transacao.id)}
-                            className={`flex items-center justify-center w-6 h-6 rounded border-2 transition-all mt-1 ${
-                              selectedTransactions.has(transacao.id)
-                                ? 'bg-blue-500 border-blue-500 text-white'
-                                : 'border-gray-300 hover:border-blue-400'
-                            }`}
-                          >
-                            {selectedTransactions.has(transacao.id) && <Check className="h-4 w-4" />}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleToggleTransactionStatus(transacao)}
-                            className={`flex items-center justify-center w-6 h-6 rounded-lg border-2 transition-all mt-1 transform hover:scale-110 ${
-                              transacao.is_completed 
-                                ? 'bg-green-500 border-green-500 text-white shadow-lg' 
-                                : 'border-gray-300 hover:border-green-400 hover:bg-green-50'
-                            } ${isTrialExpired() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isTrialExpired()}
-                          >
-                            {transacao.is_completed && <Check className="h-4 w-4" />}
-                          </button>
-                        )}
-                        
-                        {/* Informações principais */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className={`text-base font-medium ${
-                            transacao.is_completed ? 'text-gray-600 line-through' : 'text-gray-900'
-                          }`}>
-                            {transacao.description}
-                          </h3>
-                          <div className="mt-1 flex items-center space-x-2">
-                            <span className="inline-block w-2 h-2 rounded-full" 
-                                  style={{ backgroundColor: transacao.category?.color || '#gray' }}></span>
-                            <span className="text-sm text-gray-600">{transacao.category?.name || 'Sem categoria'}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Valor */}
-                      <div className={`text-right font-semibold text-lg ${
-                        transacao.type === 'income' ? 'text-green-600' : 'text-red-600'
-                      } ${transacao.is_completed ? 'opacity-60' : ''}`}>
-                        {transacao.type === 'income' ? '+' : '-'}{formatarValor(transacao.amount)}
-                      </div>
-                    </div>
-                    
-                    {/* Informações secundárias */}
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-3 flex-wrap">
-                        <span>{getCardName(transacao.card_id)}</span>
-                        <span>•</span>
-                        <span>{formatarData(transacao.transaction_date)}</span>
-                        {transacao.due_date && (
-                          <>
-                            <span>•</span>
-                            <span className="text-orange-600">📅 {formatarData(transacao.due_date)}</span>
-                          </>
-                        )}
-
-                        {/* Mostrar informações de parcela se existir */}
-                        {transacao.installment_number && transacao.total_installments && (
-                          <>
-                            <span>•</span>
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              📅 {transacao.installment_number}/{transacao.total_installments}
-                            </span>
-                          </>
-                        )}
-
-                        {transacao.is_completed && (
-                          <>
-                            <span>•</span>
-                            <span className="text-green-600">✅</span>
-                          </>
-                        )}
-                      </div>
-                      
-                      {/* Botões de ação - só no modo normal */}
-                      {!isSelectMode && (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleEditTransaction(transacao)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              isTrialExpired() 
-                                ? 'text-gray-400 cursor-not-allowed' 
-                                : 'text-blue-600 hover:bg-blue-50'
-                            }`}
-                            disabled={isTrialExpired()}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteTransaction(transacao.id, transacao.description)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              isTrialExpired() 
-                                ? 'text-gray-400 cursor-not-allowed' 
-                                : 'text-red-600 hover:bg-red-50'
-                            }`}
-                            disabled={isTrialExpired()}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Layout Desktop */}
-                  <div className="hidden lg:flex items-center justify-between">
-                    <div className="flex items-center space-x-4 flex-1">
-                      {/* Checkbox */}
-                      {isSelectMode ? (
-                        <button
-                          onClick={() => handleSelectTransaction(transacao.id)}
-                          className={`flex items-center justify-center w-6 h-6 rounded border-2 transition-all ${
-                            selectedTransactions.has(transacao.id)
-                              ? 'bg-blue-500 border-blue-500 text-white'
-                              : 'border-gray-300 hover:border-blue-400'
-                          }`}
-                        >
-                          {selectedTransactions.has(transacao.id) && <Check className="h-4 w-4" />}
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleToggleTransactionStatus(transacao)}
-                          className={`flex items-center justify-center w-6 h-6 rounded-lg border-2 transition-all transform ${
-                            transacao.is_completed 
-                              ? 'bg-green-500 border-green-500 text-white shadow-lg' 
-                              : 'border-gray-300 hover:border-green-400 hover:bg-green-50'
-                          } ${isTrialExpired() ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
-                          disabled={isTrialExpired()}
-                        >
-                          {transacao.is_completed && <Check className="h-4 w-4" />}
-                        </button>
-                      )}
-
-                      {/* Informações da transação */}
-                    <div className="flex-1">
-                        <h3 className={`text-lg font-medium ${
-                          transacao.is_completed ? 'text-gray-600 line-through' : 'text-gray-900'
-                        }`}>
-                          {transacao.description}
-                        </h3>
-                      <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 flex-wrap">
-                        <span className="flex items-center">
-                          <span className="inline-block w-2 h-2 rounded-full mr-2" 
-                                style={{ backgroundColor: transacao.category?.color || '#gray' }}></span>
-                          {transacao.category?.name || 'Sem categoria'}
-                        </span>
-                        <span>•</span>
-                        <span>{getCardName(transacao.card_id)}</span>
-                        <span>•</span>
-                        <span>{formatarData(transacao.transaction_date)}</span>
-                        {transacao.due_date && (
-                          <>
-                            <span>•</span>
-                            <span className="text-orange-600 font-medium">📅 Vence {formatarData(transacao.due_date)}</span>
-                          </>
-                        )}
-
-                        {/* Mostrar informações de parcela se existir */}
-                        {transacao.installment_number && transacao.total_installments && (
-                          <>
-                            <span>•</span>
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              📅 {transacao.installment_number}/{transacao.total_installments}
-                            </span>
-                          </>
-                        )}
-
-                          {transacao.is_completed && (
-                            <>
-                              <span>•</span>
-                              <span className="text-green-600 font-medium">✅ Finalizada</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Valor e botões de ação */}
-                    <div className="flex items-center space-x-4">
-                    <div className={`text-right font-semibold text-lg ${
-                      transacao.type === 'income' ? 'text-green-600' : 'text-red-600'
-                      } ${transacao.is_completed ? 'opacity-60' : ''}`}>
-                      {transacao.type === 'income' ? '+' : '-'}{formatarValor(transacao.amount)}
-                      </div>
-
-                      {/* Botões de ação individual */}
-                      {!isSelectMode && (
-                        <>
-                          <button
-                            onClick={() => handleEditTransaction(transacao)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              isTrialExpired() 
-                                ? 'text-gray-400 cursor-not-allowed' 
-                                : 'text-blue-600 hover:bg-blue-50'
-                            }`}
-                            disabled={isTrialExpired()}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                      <button
-                        onClick={() => handleDeleteTransaction(transacao.id, transacao.description)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          isTrialExpired() 
-                            ? 'text-gray-400 cursor-not-allowed' 
-                            : 'text-red-600 hover:bg-red-50'
-                        }`}
-                        disabled={isTrialExpired()}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-8 lg:p-12 text-center">
-              <div className="text-gray-400 text-4xl lg:text-6xl mb-4">💳</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma transação encontrada</h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm || filtroTipo !== 'todas' 
-                  ? 'Tente ajustar os filtros ou criar uma nova transação.' 
-                  : 'Comece adicionando sua primeira transação.'
-                }
-              </p>
-              <button 
-                onClick={handleNewTransactionClick}
-                className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                {isTrialExpired() ? 'Renovar para Adicionar' : canCreateTransaction ? 'Adicionar Primeira Transação' : 'Configurar Pré-requisitos'}
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Lista de Transações com Agrupamento de Parcelas */}
+        <TransactionsList
+          transactions={transacoesFiltradas}
+          selectedTransactions={selectedTransactions}
+          isSelectMode={isSelectMode}
+          onSelect={handleSelectTransaction}
+          onToggleStatus={handleToggleTransactionStatus}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteTransaction}
+          formatValue={formatarValor}
+          formatDate={formatarData}
+          getCardName={getCardName}
+          isTrialExpired={isTrialExpired()}
+        />
 
         {/* Botão Carregar Mais */}
         {hasMoreTransactions && transacoesFiltradas.length > 0 && (

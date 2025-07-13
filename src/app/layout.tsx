@@ -5,6 +5,7 @@ import { FinancialProvider } from '@/context/financial-context';
 import { AuthProvider } from '@/context/auth-context';
 import { ConditionalNavigation } from '@/components/conditional-navigation';
 import { AIAssistantWrapper } from '@/components/ai-assistant-wrapper';
+import { AdminButton } from '@/components/admin-button';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -241,6 +242,7 @@ export default function RootLayout({
               {children}
             </ConditionalNavigation>
             <AIAssistantWrapper />
+            <AdminButton />
           </FinancialProvider>
         </AuthProvider>
       </body>

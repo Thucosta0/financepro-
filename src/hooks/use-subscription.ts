@@ -41,10 +41,10 @@ export const useSubscription = () => {
     try {
       setLoading(true)
 
-      // 1. Buscar perfil do usuário para pegar data de criação
+      // 1. Buscar perfil do usuário para pegar data de criação E status premium
       const { data: profile } = await supabase
         .from('profiles')
-        .select('created_at')
+        .select('created_at, is_premium, premium_until')
         .eq('id', user.id)
         .single()
 
@@ -52,20 +52,35 @@ export const useSubscription = () => {
       const creationDate = new Date(userCreatedAt)
       const now = new Date()
       
-      // 2. Calcular dias desde criação
+      // 2. Verificar se tem premium ativo
+      const isPremium = profile?.is_premium || false
+      let premiumValid = false
+      
+      if (isPremium) {
+        // Se tem premium_until, verificar se ainda é válido
+        if (profile?.premium_until) {
+          const premiumUntil = new Date(profile.premium_until)
+          premiumValid = now <= premiumUntil
+        } else {
+          // Se não tem data de expiração, assume que é válido
+          premiumValid = true
+        }
+      }
+      
+      // 3. Calcular dias desde criação (só para trial)
       const daysSinceCreation = Math.floor((now.getTime() - creationDate.getTime()) / (1000 * 60 * 60 * 24))
       
-      // 3. Determinar status baseado em 30 dias de trial
+      // 4. Determinar status baseado em premium primeiro, depois trial
       const trialDaysRemaining = Math.max(0, 30 - daysSinceCreation)
       const isTrialActive = trialDaysRemaining > 0
       
-      // 4. Data de fim do trial
+      // 5. Data de fim do trial
       const trialEnd = new Date(creationDate.getTime() + (30 * 24 * 60 * 60 * 1000))
 
-      // 5. Verificar se tem assinatura PRO ativa (futura implementação)
-      const hasProSubscription = false // TODO: verificar stripe
+      // 6. Verificar se tem assinatura PRO ativa (Stripe ou Premium manual)
+      const hasProSubscription = premiumValid // Premium manual ou Stripe
 
-      // 6. Determinar status efetivo
+      // 7. Determinar status efetivo
       let effectiveStatus = 'expired'
       if (hasProSubscription) {
         effectiveStatus = 'active_paid'
@@ -73,15 +88,15 @@ export const useSubscription = () => {
         effectiveStatus = 'active_trial'
       }
 
-      // 7. Criar objeto de subscription
+      // 8. Criar objeto de subscription
       const subscriptionData: SubscriptionStatus = {
-        plan_id: hasProSubscription ? 'pro' : 'free',
+        plan_id: hasProSubscription ? 'premium' : 'free',
         status: 'active',
         trial_start: creationDate.toISOString(),
         trial_end: trialEnd.toISOString(),
         trial_days_remaining: trialDaysRemaining,
         current_period_start: creationDate.toISOString(),
-        current_period_end: trialEnd.toISOString(),
+        current_period_end: profile?.premium_until || trialEnd.toISOString(),
         stripe_customer_id: null,
         stripe_subscription_id: null,
         cancel_at_period_end: false,
@@ -149,9 +164,9 @@ export const useSubscription = () => {
     return true
   }, [subscription])
 
-  // Verificar se é plano PRO
+  // Verificar se é plano PRO/PREMIUM
   const isPro = useCallback((): boolean => {
-    return subscription?.plan_id === 'pro' && subscription?.effective_status === 'active_paid'
+    return subscription?.effective_status === 'active_paid'
   }, [subscription])
 
   // Verificar se está em trial
@@ -178,7 +193,7 @@ export const useSubscription = () => {
       case 'active_trial':
         return `🎉 Acesso completo ativo - ${subscription.trial_days_remaining} dias restantes`
       case 'active_paid':
-        return 'Plano PRO ativo'
+        return '✨ Plano PREMIUM ativo'
       case 'expired':
         return 'Trial expirado - Faça upgrade para continuar'
       default:

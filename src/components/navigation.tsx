@@ -6,6 +6,7 @@ import { CreditCard, Receipt, Target, Menu, X, Layers, BarChart3, Wallet, LogOut
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/auth-context'
 import { supabase } from '@/lib/supabase-client'
+import { PremiumStatusBadge } from './premium-status-badge'
 
 const menuItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -131,7 +132,10 @@ export function Navigation() {
               </div>
             </div>
           </div>
-          <p className="text-xs text-blue-600 mt-2 font-medium">Clique para editar perfil</p>
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-blue-600 font-medium">Clique para editar perfil</p>
+            <PremiumStatusBadge />
+          </div>
         </Link>
 
         {/* Navigation */}

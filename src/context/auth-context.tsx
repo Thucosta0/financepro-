@@ -104,30 +104,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Se for username, buscar email primeiro
         
         try {
-          // Buscar username
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('email, username')
-            .eq('username', emailOrUsername.trim())
-            .maybeSingle()
+          console.log('🔍 Buscando username:', emailOrUsername.trim())
           
-          if (error) {
-            return { success: false, message: 'Erro ao buscar nome de usuário' }
+          // Buscar username via API route
+          const response = await fetch('/api/auth/find-user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username: emailOrUsername.trim() })
+          })
+          
+          const result = await response.json()
+          
+          if (!response.ok) {
+            console.error('❌ Erro ao buscar username:', result.error)
+            return { success: false, message: result.error || 'Nome de usuário não encontrado' }
           }
           
-          if (!data?.email) {
+          if (!result.email) {
             return { success: false, message: 'Nome de usuário não encontrado' }
           }
           
-          // Tentar login com o email encontrado
-          const result = await signIn(data.email, password)
+          console.log('✅ Email encontrado para username:', result.email)
           
-          if (result.error) {
+          // Tentar login com o email encontrado
+          const loginResult = await signIn(result.email, password)
+          
+          if (loginResult.error) {
             return { success: false, message: 'Senha incorreta' }
           }
           
-          if (result.user) {
-            setUser(result.user)
+          if (loginResult.user) {
+            setUser(loginResult.user)
             return { success: true }
           }
         } catch (usernameError) {
