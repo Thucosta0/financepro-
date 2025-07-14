@@ -3,7 +3,7 @@
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ComposedChart, Line } from 'recharts'
 import { useState } from 'react'
 import { useFinancial } from '@/context/financial-context'
-import { PieChart as PieChartIcon, TrendingUp, CalendarDays, ArrowUpDown } from 'lucide-react'
+import { PieChart as PieChartIcon, TrendingUp, CalendarDays, ArrowUpDown, Filter, X } from 'lucide-react'
 import type { Transaction } from '@/lib/supabase-client'
 import * as XLSX from 'xlsx-js-style'
 
@@ -180,7 +180,6 @@ export function MonthlyAnalysisChart({ transactions }: ChartsProps) {
     })
   }
   const [presetPeriod, setPresetPeriod] = useState('last3')
-  const [viewMode, setViewMode] = useState<'chart' | 'list'>('list')
   const [isExporting, setIsExporting] = useState(false)
   const [sortOrder, setSortOrder] = useState<'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc'>('amount-desc')
 
@@ -841,48 +840,22 @@ export function MonthlyAnalysisChart({ transactions }: ChartsProps) {
         </div>
       </div>
 
-      {/* Controles: Toggle + Ordenação + Exportação */}
+      {/* Controles: Ordenação + Exportação */}
       <div className="flex flex-col lg:flex-row justify-between items-center space-y-3 lg:space-y-0 lg:space-x-4">
-        {/* Toggle entre Gráfico e Lista */}
-        <div className="bg-gray-100 rounded-lg p-1 flex">
-          <button
-            onClick={() => setViewMode('chart')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              viewMode === 'chart'
-                ? 'bg-white text-blue-700 shadow-sm border border-blue-200'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+        {/* Controle de Ordenação */}
+        <div className="flex items-center space-x-2">
+          <ArrowUpDown className="h-4 w-4 text-gray-400" />
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            📊 Gráfico
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              viewMode === 'list'
-                ? 'bg-white text-blue-700 shadow-sm border border-blue-200'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            📋 Lista
-          </button>
+            <option value="amount-desc">💰 Valor (Maior)</option>
+            <option value="amount-asc">💰 Valor (Menor)</option>
+            <option value="date-desc">📅 Data (Mais recente)</option>
+            <option value="date-asc">📅 Data (Mais antiga)</option>
+          </select>
         </div>
-
-        {/* Controle de Ordenação (só aparece no modo lista) */}
-        {viewMode === 'list' && (
-          <div className="flex items-center space-x-2">
-            <ArrowUpDown className="h-4 w-4 text-gray-400" />
-                         <select
-               value={sortOrder}
-               onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
-               className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-             >
-               <option value="amount-desc">💰 Valor (Maior)</option>
-               <option value="amount-asc">💰 Valor (Menor)</option>
-               <option value="date-desc">📅 Data (Mais recente)</option>
-               <option value="date-asc">📅 Data (Mais antiga)</option>
-             </select>
-          </div>
-        )}
 
         {/* Botões de Exportação */}
         <div className="flex space-x-2">
@@ -959,131 +932,81 @@ export function MonthlyAnalysisChart({ transactions }: ChartsProps) {
         </div>
       </div>
 
-      {/* Conteúdo baseado no modo selecionado */}
-      {viewMode === 'chart' ? (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-base font-semibold text-gray-900 mb-4 text-center">
-            📈 {periodType === 'single' ? 'Movimentação Diária' : 'Movimentação Mensal'} de {getPeriodLabel()}
-          </h3>
-          
-          {(periodType === 'single' ? dailyData : monthlyData).length === 0 ? (
-            <div className="flex items-center justify-center h-64 text-gray-500">
-              <div className="text-center">
-                <div className="text-3xl mb-2">📊</div>
-                <p className="font-medium">Nenhuma transação encontrada</p>
-                <p className="text-sm mt-1">para o período selecionado</p>
-              </div>
+      {/* Lista de Transações */}
+      <div className="bg-gray-50 rounded-lg p-4">
+        <h3 className="text-base font-semibold text-gray-900 mb-4 text-center">
+          📋 Transações de {getPeriodLabel()}
+        </h3>
+        
+        {filteredTransactions.length === 0 ? (
+          <div className="flex items-center justify-center h-32 text-gray-500">
+            <div className="text-center">
+              <div className="text-3xl mb-2">📅</div>
+              <p className="font-medium">Nenhuma transação encontrada</p>
+              <p className="text-sm mt-1">para o período selecionado</p>
             </div>
-          ) : (
-            <div className="h-80 bg-white rounded-lg p-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart 
-                  data={periodType === 'single' ? dailyData : monthlyData} 
-                  margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey={periodType === 'single' ? 'dayLabel' : 'monthLabel'}
-                    tick={{ fontSize: 11 }}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 11 }} 
-                    tickFormatter={formatValueDetailed}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="receitas" fill="#10b981" name="Receitas" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="despesas" fill="#ef4444" name="Despesas" radius={[2, 2, 0, 0]} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="saldo" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3}
-                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                    name="Saldo"
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-base font-semibold text-gray-900 mb-4 text-center">
-            📋 Transações de {getPeriodLabel()}
-          </h3>
-          
-          {filteredTransactions.length === 0 ? (
-            <div className="flex items-center justify-center h-32 text-gray-500">
-              <div className="text-center">
-                <div className="text-3xl mb-2">📅</div>
-                <p className="font-medium">Nenhuma transação encontrada</p>
-                <p className="text-sm mt-1">para o período selecionado</p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {filteredTransactions.slice(0, 20).map((transaction, index) => {
-                const isIncome = transaction.type === 'income'
-                
-                return (
-                  <div key={transaction.id || index} className="bg-white rounded-lg p-4 shadow-sm border">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start space-x-3">
-                          <div 
-                            className="w-3 h-3 rounded-full flex-shrink-0 mt-1.5"
-                            style={{ backgroundColor: transaction.category?.color || (isIncome ? '#10b981' : '#ef4444') }}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 leading-tight">
-                              {transaction.description || 'Transação sem descrição'}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1 flex items-center">
-                              <span className="font-medium">
-                                {transaction.category?.name || 'Sem categoria'}
-                              </span>
-                              {transaction.card?.name && (
-                                <>
-                                  <span className="mx-1">•</span>
-                                  <span>{transaction.card.name}</span>
-                                </>
-                              )}
-                              <span className="mx-1">•</span>
-                              <span>{formatDate(transaction.transaction_date)}</span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right ml-3 flex-shrink-0">
-                        <div className={`text-sm font-bold ${
-                          isIncome ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {isIncome ? '+' : '-'}{formatValueDetailed(transaction.amount)}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-0.5">
-                          {isIncome ? 'Receita' : 'Despesa'}
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {filteredTransactions.slice(0, 20).map((transaction, index) => {
+              const isIncome = transaction.type === 'income'
+              
+              return (
+                <div key={transaction.id || index} className="bg-white rounded-lg p-4 shadow-sm border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start space-x-3">
+                        <div 
+                          className="w-3 h-3 rounded-full flex-shrink-0 mt-1.5"
+                          style={{ backgroundColor: transaction.category?.color || (isIncome ? '#10b981' : '#ef4444') }}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 leading-tight">
+                            {transaction.description || 'Transação sem descrição'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1 flex items-center">
+                            <span className="font-medium">
+                              {transaction.category?.name || 'Sem categoria'}
+                            </span>
+                            {transaction.card?.name && (
+                              <>
+                                <span className="mx-1">•</span>
+                                <span>{transaction.card.name}</span>
+                              </>
+                            )}
+                            <span className="mx-1">•</span>
+                            <span>{formatDate(transaction.transaction_date)}</span>
+                          </p>
                         </div>
                       </div>
                     </div>
+                    <div className="text-right ml-3 flex-shrink-0">
+                      <div className={`text-sm font-bold ${
+                        isIncome ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {isIncome ? '+' : '-'}{formatValueDetailed(transaction.amount)}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {isIncome ? 'Receita' : 'Despesa'}
+                      </div>
+                    </div>
                   </div>
-                )
-              })}
-              {filteredTransactions.length > 20 && (
-                <div className="text-center p-4 bg-white rounded-lg border border-dashed">
-                  <p className="text-gray-500 text-sm">
-                    E mais {filteredTransactions.length - 20} transações...
-                  </p>
-                  <p className="text-gray-400 text-xs mt-1">
-                    Use a exportação para ver o relatório completo
-                  </p>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+              )
+            })}
+            {filteredTransactions.length > 20 && (
+              <div className="text-center p-4 bg-white rounded-lg border border-dashed">
+                <p className="text-gray-500 text-sm">
+                  E mais {filteredTransactions.length - 20} transações...
+                </p>
+                <p className="text-gray-400 text-xs mt-1">
+                  Use a exportação para ver o relatório completo
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -1238,80 +1161,302 @@ function InstallmentSummary({ transactions }: { transactions: Transaction[] }) {
 
 // Componente principal que agrega todos os gráficos
 export function Charts() {
-  const { transactions } = useFinancial()
-  const [activeChart, setActiveChart] = useState('monthly')
+  const { transactions, categories, cards } = useFinancial()
+  const [showFilters, setShowFilters] = useState(false)
+  
+  // Estados dos filtros
+  const [filters, setFilters] = useState({
+    dateRange: {
+      startDate: '',
+      endDate: ''
+    },
+    categoryId: '',
+    cardId: '',
+    transactionType: 'all', // 'all', 'income', 'expense'
+    amountRange: {
+      min: '',
+      max: ''
+    },
+    completedOnly: false
+  })
 
-  // Configuração das abas de gráficos
-  const chartTabs = [
-    { id: 'monthly', label: 'Análise Mensal', shortLabel: 'Mensal', icon: CalendarDays },
-    { id: 'categories', label: 'Por Categoria', shortLabel: 'Categorias', icon: PieChartIcon },
-    { id: 'evolution', label: 'Evolução', shortLabel: 'Evolução', icon: TrendingUp }
-  ]
+  // Função para filtrar transações
+  const filteredTransactions = transactions.filter(transaction => {
+    // Filtro de data
+    if (filters.dateRange.startDate) {
+      const transactionDate = new Date(transaction.transaction_date)
+      const startDate = new Date(filters.dateRange.startDate)
+      if (transactionDate < startDate) return false
+    }
+    
+    if (filters.dateRange.endDate) {
+      const transactionDate = new Date(transaction.transaction_date)
+      const endDate = new Date(filters.dateRange.endDate)
+      if (transactionDate > endDate) return false
+    }
+    
+    // Filtro de categoria
+    if (filters.categoryId && transaction.category_id !== filters.categoryId) {
+      return false
+    }
+    
+    // Filtro de cartão
+    if (filters.cardId && transaction.card_id !== filters.cardId) {
+      return false
+    }
+    
+    // Filtro de tipo de transação
+    if (filters.transactionType !== 'all' && transaction.type !== filters.transactionType) {
+      return false
+    }
+    
+    // Filtro de valor
+    if (filters.amountRange.min && transaction.amount < parseFloat(filters.amountRange.min)) {
+      return false
+    }
+    
+    if (filters.amountRange.max && transaction.amount > parseFloat(filters.amountRange.max)) {
+      return false
+    }
+    
+    // Filtro de transações finalizadas
+    if (filters.completedOnly && !transaction.is_completed) {
+      return false
+    }
+    
+    return true
+  })
+
+  // Função para limpar filtros
+  const clearFilters = () => {
+    setFilters({
+      dateRange: { startDate: '', endDate: '' },
+      categoryId: '',
+      cardId: '',
+      transactionType: 'all',
+      amountRange: { min: '', max: '' },
+      completedOnly: false
+    })
+  }
+
+  // Verificar se há filtros ativos
+  const hasActiveFilters = filters.dateRange.startDate || filters.dateRange.endDate || 
+    filters.categoryId || filters.cardId || filters.transactionType !== 'all' || 
+    filters.amountRange.min || filters.amountRange.max || filters.completedOnly
 
   return (
     <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-      <div className="p-4 lg:p-6 border-b border-gray-200">
-        <div className="flex flex-col space-y-4">
-          <h2 className="text-lg lg:text-xl font-semibold text-gray-900 text-center lg:text-left">
-            📊 Análise Visual Avançada
-          </h2>
-          
-          {/* Abas Mobile-First */}
-          <div className="flex w-full">
-            <div className="flex w-full bg-gray-100 rounded-lg p-1 overflow-x-auto">
-              {chartTabs.map((tab) => {
-                const Icon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveChart(tab.id)}
-                    className={`flex-1 min-w-0 flex flex-col items-center justify-center px-2 py-3 lg:px-4 lg:py-2 lg:flex-row rounded-md text-xs lg:text-sm font-medium transition-all whitespace-nowrap ${
-                      activeChart === tab.id
-                        ? 'bg-white text-blue-700 shadow-sm border border-blue-200'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
+      {/* Filtros */}
+      {showFilters && (
+        <div className="p-4 lg:p-6 border-b border-gray-200">
+          <div className="bg-gray-50 rounded-lg p-4 border">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Filtro de Data */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Data Inicial</label>
+                  <input
+                    type="date"
+                    value={filters.dateRange.startDate}
+                    onChange={(e) => setFilters({...filters, dateRange: {...filters.dateRange, startDate: e.target.value}})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Data Final</label>
+                  <input
+                    type="date"
+                    value={filters.dateRange.endDate}
+                    onChange={(e) => setFilters({...filters, dateRange: {...filters.dateRange, endDate: e.target.value}})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+                
+                {/* Filtro de Categoria */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Categoria</label>
+                  <select
+                    value={filters.categoryId}
+                    onChange={(e) => setFilters({...filters, categoryId: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
-                    <Icon className="h-4 w-4 lg:h-4 lg:w-4 lg:mr-2 mb-1 lg:mb-0" />
-                    <span className="hidden sm:inline lg:hidden">{tab.shortLabel}</span>
-                    <span className="hidden lg:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.shortLabel}</span>
+                    <option value="">Todas as categorias</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Filtro de Cartão */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Cartão/Conta</label>
+                  <select
+                    value={filters.cardId}
+                    onChange={(e) => setFilters({...filters, cardId: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">Todos os cartões</option>
+                    {cards.map(card => (
+                      <option key={card.id} value={card.id}>
+                        {card.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              
+              {/* Segunda linha de filtros */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                {/* Filtro de Tipo */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Tipo</label>
+                  <select
+                    value={filters.transactionType}
+                    onChange={(e) => setFilters({...filters, transactionType: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="all">Todas</option>
+                    <option value="income">Receitas</option>
+                    <option value="expense">Despesas</option>
+                  </select>
+                </div>
+                
+                {/* Filtro de Valor Mínimo */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Valor Mínimo</label>
+                  <input
+                    type="number"
+                    value={filters.amountRange.min}
+                    onChange={(e) => setFilters({...filters, amountRange: {...filters.amountRange, min: e.target.value}})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="R$ 0,00"
+                    step="0.01"
+                  />
+                </div>
+                
+                {/* Filtro de Valor Máximo */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Valor Máximo</label>
+                  <input
+                    type="number"
+                    value={filters.amountRange.max}
+                    onChange={(e) => setFilters({...filters, amountRange: {...filters.amountRange, max: e.target.value}})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="R$ 0,00"
+                    step="0.01"
+                  />
+                </div>
+                
+                {/* Filtro de Status */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Status</label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.completedOnly}
+                      onChange={(e) => setFilters({...filters, completedOnly: e.target.checked})}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">Apenas finalizadas</span>
+                  </label>
+                </div>
+              </div>
+              
+              {/* Botões de ação */}
+              <div className="flex justify-end space-x-2 mt-4">
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-800 text-sm"
+                  >
+                    <X className="h-4 w-4" />
+                    <span>Limpar</span>
                   </button>
-                )
-              })}
+                )}
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                >
+                  Aplicar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        )}
       
       <div className="p-4 lg:p-6">
-        {activeChart === 'monthly' && (
-          <div>
-            <h3 className="text-base lg:text-lg font-medium mb-4 text-gray-900 text-center lg:text-left">
+        {/* Indicador de filtros ativos */}
+        {hasActiveFilters && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-blue-600" />
+                <span className="text-sm text-blue-800 font-medium">
+                  Exibindo {filteredTransactions.length} de {transactions.length} transações
+                </span>
+              </div>
+              <button
+                onClick={clearFilters}
+                className="text-blue-600 hover:text-blue-800 text-sm underline"
+              >
+                Remover filtros
+              </button>
+            </div>
+          </div>
+        )}
+        <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 mb-4">
+            <h3 className="text-base lg:text-lg font-medium text-gray-900 text-center lg:text-left">
               📈 Análise Mensal Completa
+              {hasActiveFilters && <span className="text-sm text-gray-500 ml-2">(Filtrada)</span>}
             </h3>
-            <InstallmentSummary transactions={transactions} />
-            <MonthlyAnalysisChart transactions={transactions} />
+            
+            {/* Botão de filtros movido para cá */}
+            <div className="flex items-center space-x-2">
+              {hasActiveFilters && (
+                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                  {filteredTransactions.length} de {transactions.length} transações
+                </span>
+              )}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm transition-all ${
+                  showFilters || hasActiveFilters
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Filter className="h-4 w-4" />
+                <span>Filtros</span>
+                {hasActiveFilters && (
+                  <span className="bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    !
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
-        )}
+          <InstallmentSummary transactions={filteredTransactions} />
+          <MonthlyAnalysisChart transactions={filteredTransactions} />
+        </div>
         
-        {activeChart === 'categories' && (
-          <div>
-            <h3 className="text-base lg:text-lg font-medium mb-4 text-gray-900 text-center lg:text-left">
-              🎯 Distribuição de Despesas por Categoria
-            </h3>
-            <ExpenseByCategoryChart transactions={transactions} />
-          </div>
-        )}
-        
-        {activeChart === 'evolution' && (
-          <div>
-            <h3 className="text-base lg:text-lg font-medium mb-4 text-gray-900 text-center lg:text-left">
-              📈 Evolução do Saldo
-            </h3>
-            <BalanceEvolutionChart transactions={transactions} />
+        {/* Mensagem quando não há dados filtrados */}
+        {hasActiveFilters && filteredTransactions.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">🔍</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma transação encontrada</h3>
+            <p className="text-gray-600 mb-4">Tente ajustar os filtros para ver mais resultados.</p>
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Limpar todos os filtros
+            </button>
           </div>
         )}
       </div>
     </div>
   )
-} 
+}

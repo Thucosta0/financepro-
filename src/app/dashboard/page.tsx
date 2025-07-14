@@ -86,27 +86,7 @@ export default function DashboardPage() {
     setShowOnboarding(false)
   }
 
-  // Estatísticas para o status do sistema
-  const systemStats = [
-    {
-      label: 'Categorias',
-      value: categories.length,
-      status: categories.length > 0 ? 'success' : 'warning',
-      action: () => router.push('/categorias')
-    },
-    {
-      label: 'Cartões Ativos',
-      value: cards.filter(c => c.is_active).length,
-      status: cards.filter(c => c.is_active).length > 0 ? 'success' : 'warning',
-      action: () => router.push('/cartoes')
-    },
-    {
-      label: 'Pronto para Transações',
-      value: canCreateTransaction ? 'Sim' : 'Não',
-      status: canCreateTransaction ? 'success' : 'warning',
-      action: () => router.push('/categorias')
-    }
-  ]
+
 
   // Mostrar loading enquanto carrega dados
   if (isLoading) {
@@ -209,45 +189,7 @@ export default function DashboardPage() {
               <Charts />
             </div>
 
-            {/* Status do Sistema - centralizado */}
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-4 text-center">Status do Sistema</h3>
-                
-                <div className="space-y-4">
-                  {systemStats.map((stat, index) => (
-                    <div 
-                      key={index}
-                      className="flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors"
-                      onClick={stat.action}
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{stat.label}</p>
-                        <p className="text-lg font-semibold text-gray-700">{stat.value}</p>
-                      </div>
-                      <div className={`w-3 h-3 rounded-full ${
-                        stat.status === 'success' ? 'bg-green-500' : 'bg-yellow-500'
-                      }`} />
-                    </div>
-                  ))}
-                </div>
 
-                {!canCreateTransaction && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-yellow-800 text-sm">
-                      ⚠️ <strong>Sistema não configurado</strong><br />
-                      Configure categorias e cartões para começar a usar
-                    </p>
-                    <button
-                      onClick={() => router.push('/categorias')}
-                      className="mt-2 text-yellow-800 underline text-sm hover:text-yellow-900"
-                    >
-                      Configurar agora →
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
 
@@ -266,4 +208,4 @@ export default function DashboardPage() {
       </div>
     </ProtectedRoute>
   )
-} 
+}

@@ -33,6 +33,12 @@ export default function TransacoesPage() {
     max: ''
   })
   const [installmentFilter, setInstallmentFilter] = useState('')
+  const [monthFilter, setMonthFilter] = useState(() => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    return `${year}-${month}`
+  })
   
   const { 
     transactions, 
@@ -333,8 +339,16 @@ export default function TransacoesPage() {
       return transactionYear === filterYear && transactionMonth === filterMonth
     })()
     
+    // Filtro por mês específico
+    const matchMonth = !monthFilter || (() => {
+      const transactionMonth = transactionDate.getMonth() + 1
+      const transactionYear = transactionDate.getFullYear()
+      const [filterYear, filterMonth] = monthFilter.split('-').map(Number)
+      return transactionYear === filterYear && transactionMonth === filterMonth
+    })()
+    
     return (matchDescricao || matchCategoria) && matchTipo && matchCategory && matchCard && 
-           matchStartDate && matchEndDate && matchMinAmount && matchMaxAmount && matchInstallment
+           matchStartDate && matchEndDate && matchMinAmount && matchMaxAmount && matchInstallment && matchMonth
   })
 
   const formatarValor = (valor: number) => {
@@ -473,6 +487,7 @@ export default function TransacoesPage() {
     setCardFilter('')
     setAmountFilter({ min: '', max: '' })
     setInstallmentFilter('')
+    setMonthFilter('')
     setShowAdvancedFilters(false)
   }
 
@@ -700,6 +715,17 @@ export default function TransacoesPage() {
                   <option value="expense">Despesas</option>
                 </select>
                 
+                <div className="flex-1 sm:flex-none">
+                  <input
+                    type="month"
+                    value={monthFilter}
+                    onChange={(e) => setMonthFilter(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    title="Filtrar por mês específico"
+                    placeholder="Selecionar mês"
+                  />
+                </div>
+                
                 <button 
                   onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                   className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm bg-white"
@@ -872,4 +898,4 @@ export default function TransacoesPage() {
       </div>
     </ProtectedRoute>
   )
-} 
+}

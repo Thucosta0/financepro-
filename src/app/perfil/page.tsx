@@ -8,6 +8,7 @@ import { User, Mail, AtSign, Save, Camera, ArrowLeft, AlertCircle, CheckCircle, 
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { UsernameInput } from '@/components/ui/username-input'
+import { useFinancial } from '@/context/financial-context'
 
 interface UserProfile {
   id: string
@@ -20,6 +21,7 @@ interface UserProfile {
 
 export default function PerfilPage() {
   const { user } = useAuth()
+  const { transactions, categories, cards } = useFinancial()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [formData, setFormData] = useState({
     name: '',
@@ -631,15 +633,15 @@ export default function PerfilPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Estatísticas da conta</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">---</div>
+                <div className="text-2xl font-bold text-blue-600">{transactions.length}</div>
                 <div className="text-sm text-gray-600">Transações</div>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">---</div>
+                <div className="text-2xl font-bold text-green-600">{categories.length}</div>
                 <div className="text-sm text-gray-600">Categorias</div>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">---</div>
+                <div className="text-2xl font-bold text-purple-600">{cards.length}</div>
                 <div className="text-sm text-gray-600">Cartões</div>
               </div>
             </div>
@@ -648,4 +650,4 @@ export default function PerfilPage() {
       </div>
     </ProtectedRoute>
   )
-} 
+}

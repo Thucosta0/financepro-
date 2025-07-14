@@ -49,11 +49,11 @@ const TransactionItem = memo(function TransactionItem({
   isInGroup = false
 }: TransactionItemProps) {
   return (
-    <div className={`${isInGroup ? 'ml-6 border-l-2 border-blue-200 pl-4' : ''} p-4 ${isInGroup ? 'py-3' : 'py-6'} transition-colors ${
+    <div className={`${isInGroup ? 'ml-6 border-l-2 border-blue-200 pl-4' : ''} p-2 sm:p-4 ${isInGroup ? 'py-2 sm:py-3' : 'py-4 sm:py-6'} transition-colors ${
       transaction.is_completed ? 'bg-green-50 hover:bg-green-100' : 'hover:bg-gray-50'
     }`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4 flex-1">
+      <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-4 min-w-0">
+        <div className="flex items-start sm:items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
           {/* Checkbox de seleção em massa */}
           {isSelectMode && (
             <button
@@ -92,52 +92,54 @@ const TransactionItem = memo(function TransactionItem({
             }`}>
               {transaction.description}
             </h3>
-            <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <span className="inline-block w-2 h-2 rounded-full mr-2" 
-                      style={{ backgroundColor: transaction.category?.color || '#gray' }}></span>
-                {transaction.category?.name || 'Sem categoria'}
-              </span>
-              <span>•</span>
-              <span>{getCardName(transaction.card_id)}</span>
-              <span>•</span>
-              <span>{formatDate(transaction.transaction_date)}</span>
-
-              {/* Mostrar informações de parcela se existir */}
-              {transaction.installment_number && transaction.total_installments && (
-                <>
-                  <span>•</span>
+            <div className="mt-1 space-y-1">
+              {/* Primeira linha: Categoria e Cartão */}
+              <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-500">
+                <span className="flex items-center">
+                  <span className="inline-block w-2 h-2 rounded-full mr-2" 
+                        style={{ backgroundColor: transaction.category?.color || '#gray' }}></span>
+                  {transaction.category?.name || 'Sem categoria'}
+                </span>
+                <span className="hidden sm:inline">•</span>
+                <span>{getCardName(transaction.card_id)}</span>
+              </div>
+              
+              {/* Segunda linha: Data, Parcela e Status */}
+              <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-500">
+                <span>{formatDate(transaction.transaction_date)}</span>
+                
+                {/* Mostrar informações de parcela se existir */}
+                {transaction.installment_number && transaction.total_installments && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     📅 {transaction.installment_number}/{transaction.total_installments}
                   </span>
-                </>
-              )}
+                )}
 
-              {transaction.is_completed && (
-                <>
-                  <span>•</span>
+                {transaction.is_completed && (
                   <span className="text-green-600 font-medium">✅ Finalizada</span>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Valor e botões de ação */}
-        <div className="flex items-center space-x-4">
-          <div className={`text-right font-semibold ${isInGroup ? 'text-base' : 'text-lg'} ${
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+          <div className={`text-right font-semibold ${isInGroup ? 'text-sm sm:text-base' : 'text-base sm:text-lg'} ${
             transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-          } ${transaction.is_completed ? 'opacity-60' : ''}`}>
-            {transaction.type === 'income' ? '+' : '-'}{formatValue(transaction.amount)}
+          } ${transaction.is_completed ? 'opacity-60' : ''} min-w-0`}>
+            <div className="truncate">
+              {transaction.type === 'income' ? '+' : '-'}{formatValue(transaction.amount)}
+            </div>
           </div>
 
           {/* Botões de ação individual - ocultos no modo de seleção */}
           {!isSelectMode && (
-            <>
+            <div className="flex items-center space-x-1 sm:space-x-2">
               {/* Botão de editar */}
               <button
                 onClick={() => onEdit?.(transaction)}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                   isTrialExpired 
                     ? 'text-gray-400 cursor-not-allowed' 
                     : 'text-blue-600 hover:bg-blue-50'
@@ -145,13 +147,13 @@ const TransactionItem = memo(function TransactionItem({
                 title={isTrialExpired ? 'Trial expirado' : 'Editar transação'}
                 disabled={isTrialExpired}
               >
-                <Edit2 className="h-4 w-4" />
+                <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
 
               {/* Botão de excluir */}
               <button
                 onClick={() => onDelete?.(transaction.id, transaction.description)}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                   isTrialExpired 
                     ? 'text-gray-400 cursor-not-allowed' 
                     : 'text-red-600 hover:bg-red-50'
@@ -159,9 +161,9 @@ const TransactionItem = memo(function TransactionItem({
                 title={isTrialExpired ? 'Trial expirado' : 'Excluir transação'}
                 disabled={isTrialExpired}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -246,9 +248,9 @@ const TransactionGroupItem = memo(function TransactionGroupItem({
       'border-blue-500 bg-blue-50'
     }`}>
       {/* Cabeçalho do grupo */}
-      <div className="p-4 hover:bg-white/50 transition-colors">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 flex-1">
+      <div className="p-2 sm:p-4 hover:bg-white/50 transition-colors">
+        <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-4 min-w-0">
+          <div className="flex items-start sm:items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
             {/* Checkbox de seleção em massa */}
             {isSelectMode && (
               <button
@@ -299,65 +301,70 @@ const TransactionGroupItem = memo(function TransactionGroupItem({
             </button>
 
             {/* Informações do grupo */}
-            <div className="flex-1">
-              <h3 className={`text-lg font-semibold ${
+            <div className="flex-1 min-w-0">
+              <h3 className={`text-base sm:text-lg font-semibold ${
                 allCompleted ? 'text-gray-600 line-through' : 'text-gray-900'
               }`}>
                 <CreditCard className="inline h-4 w-4 mr-2" />
-                {group.description}
+                <span className="truncate">{group.description}</span>
               </h3>
-              <div className="mt-1 flex items-center space-x-4 text-sm text-gray-600">
-                <span className="flex items-center">
-                  <span className="inline-block w-2 h-2 rounded-full mr-2" 
-                        style={{ backgroundColor: group.category?.color || '#gray' }}></span>
-                  {group.category?.name || 'Sem categoria'}
-                </span>
-                <span>•</span>
-                <span>{getCardName(group.card_id)}</span>
-                <span>•</span>
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  📅 {group.completedInstallments}/{group.totalInstallments} parcelas
-                </span>
-                {group.nextDueDate && (
-                  <>
-                    <span>•</span>
+              <div className="mt-1 space-y-1">
+                {/* Primeira linha: Categoria e Cartão */}
+                <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
+                  <span className="flex items-center">
+                    <span className="inline-block w-2 h-2 rounded-full mr-2" 
+                          style={{ backgroundColor: group.category?.color || '#gray' }}></span>
+                    {group.category?.name || 'Sem categoria'}
+                  </span>
+                  <span className="hidden sm:inline">•</span>
+                  <span>{getCardName(group.card_id)}</span>
+                </div>
+                
+                {/* Segunda linha: Parcelas e Próxima data */}
+                <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    📅 {group.completedInstallments}/{group.totalInstallments} parcelas
+                  </span>
+                  {group.nextDueDate && (
                     <span className="text-orange-600 font-medium">
                       <Calendar className="inline h-3 w-3 mr-1" />
                       Próxima: {formatDate(group.nextDueDate)}
                     </span>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Valor total e botões de ação */}
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <div className={`font-bold text-lg ${
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+            <div className="text-right min-w-0">
+              <div className={`font-bold text-base sm:text-lg ${
                 group.type === 'income' ? 'text-green-600' : 'text-red-600'
               } ${allCompleted ? 'opacity-60' : ''}`}>
-                {group.type === 'income' ? '+' : '-'}{formatValue(totalAmount)}
+                <div className="truncate">
+                  {group.type === 'income' ? '+' : '-'}{formatValue(totalAmount)}
+                </div>
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 truncate">
                 {formatValue(group.amount)} × {group.totalInstallments}
               </div>
             </div>
 
             {/* Botões de ação do grupo */}
             {!isSelectMode && (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-1.5 sm:p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
                   title={isExpanded ? 'Recolher parcelas' : 'Ver parcelas'}
                 >
-                  {isExpanded ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {isExpanded ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                 </button>
                 
                 <button
                   onClick={handleGroupDelete}
-                  className={`p-2 rounded-lg transition-colors ${
+                  className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                     isTrialExpired 
                       ? 'text-gray-400 cursor-not-allowed' 
                       : 'text-red-600 hover:bg-red-50'
@@ -365,7 +372,7 @@ const TransactionGroupItem = memo(function TransactionGroupItem({
                   title={isTrialExpired ? 'Trial expirado' : 'Excluir todas as parcelas'}
                   disabled={isTrialExpired}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </button>
               </div>
             )}
@@ -432,11 +439,24 @@ export const TransactionsList = memo(function TransactionsList({
     const individualTransactions: Transaction[] = []
     const processedGroupIds = new Set<string>()
 
+    // Debug: Log das transações recebidas
+    console.log('🔍 TransactionsList - Total de transações:', transactions.length)
+    console.log('🔍 TransactionsList - Transações com installment_group_id:', 
+      transactions.filter(t => t.installment_group_id).length)
+    
     // Primeiro, identificar grupos por installment_group_id
     const groupedByInstallmentId = new Map<string, Transaction[]>()
     
     transactions.forEach(transaction => {
       if (transaction.installment_group_id) {
+        console.log('📦 Encontrada transação parcelada:', {
+          id: transaction.id,
+          description: transaction.description,
+          installment_group_id: transaction.installment_group_id,
+          installment_number: transaction.installment_number,
+          total_installments: transaction.total_installments
+        })
+        
         if (!groupedByInstallmentId.has(transaction.installment_group_id)) {
           groupedByInstallmentId.set(transaction.installment_group_id, [])
         }
@@ -598,4 +618,4 @@ export const TransactionsList = memo(function TransactionsList({
       )}
     </div>
   )
-}) 
+})
