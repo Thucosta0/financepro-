@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "mcp.config.usrlocalmcp.Postgrest": {
+      "command": "npx",
+      "args": [
+        "@supabase/mcp-server-postgrest"
+      ],
+      "env": {
+        "SUPABASE_URL": "https://ejawwxkksovclhkpjcxx.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqYXd3eGtrc292Y2xoa3BqY3h4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDk5NTQ4OSwiZXhwIjoyMDY2NTcxNDg5fQ.rkuK1-9HUp1I93CYTPsmfa4Z2pUeiJXTvjeJK_By4yE"
+      },
+      "fromGalleryId": "supabase-community.mcp-supabase_mcp-server-postgrest"
+    }
+  }
+}

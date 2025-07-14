@@ -26,7 +26,7 @@ export function AIAssistant({ financialData }: AIAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: 'Olá! 👋 Sou o FinanceGPT, seu assistente financeiro! Como posso ajudar você a melhorar suas finanças hoje?',
+      content: 'Olá! 👋 Sou o ThFinanceAI, seu consultor financeiro pessoal. Faça sua pergunta e eu responderei de forma direta e prática.',
       role: 'assistant',
       timestamp: new Date()
     }
@@ -59,15 +59,15 @@ export function AIAssistant({ financialData }: AIAssistantProps) {
 
     try {
       const response = await fetch('/api/ai-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          financialData: financialData || null // Dados opcionais
-        }),
-      })
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           message: inputMessage,
+           financialData
+         }),
+       })
 
       const data = await response.json()
 
@@ -86,7 +86,7 @@ export function AIAssistant({ financialData }: AIAssistantProps) {
       console.error('Erro no assistente IA:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Desculpe, o assistente está temporariamente indisponível. Tente novamente em alguns instantes. 😔',
+        content: 'Desculpe, o ThFinanceAI está temporariamente indisponível. Tente novamente em alguns instantes. 😔',
         role: 'assistant',
         timestamp: new Date()
       }
@@ -131,7 +131,7 @@ export function AIAssistant({ financialData }: AIAssistantProps) {
                   <Bot className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-base lg:text-lg">FinanceGPT</h3>
+                  <h3 className="font-semibold text-base lg:text-lg">ThFinanceAI</h3>
                   <p className="text-xs text-blue-100">
                     {financialData ? 'Com seus dados financeiros' : 'Assistente Financeiro'}
                   </p>
@@ -223,4 +223,4 @@ export function AIAssistant({ financialData }: AIAssistantProps) {
       )}
     </>
   )
-} 
+}

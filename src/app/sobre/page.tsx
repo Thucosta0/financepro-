@@ -199,7 +199,7 @@ export default function SobrePage() {
               },
               {
                 category: "Inteligência",
-                technologies: ["OpenAI API", "Assistente IA", "Context API", "Hooks customizados"]
+                technologies: ["OpenAI API", "ThFinanceAI", "Context API", "Hooks customizados"]
               },
               {
                 category: "Performance",
@@ -262,7 +262,7 @@ export default function SobrePage() {
               },
               {
                 icon: <Brain className="h-8 w-8" />,
-                title: "Assistente IA",
+                title: "ThFinanceAI",
                 description: "Consultoria financeira personalizada 24/7",
                 color: "from-indigo-500 to-indigo-600"
               }

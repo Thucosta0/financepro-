@@ -292,7 +292,10 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Usuário
+                    Nome
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    E-mail
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
@@ -317,11 +320,13 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
                     <td className="px-6 py-4">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
                         {user.username && (
                           <div className="text-xs text-gray-400">@{user.username}</div>
                         )}
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">{user.email}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(user)}`}>
@@ -395,4 +400,4 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
       )}
     </div>
   )
-} 
+}

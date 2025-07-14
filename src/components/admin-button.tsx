@@ -365,7 +365,7 @@ export function AdminButton() {
       {/* Modal do painel de admin */}
       {showAdminPanel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white w-full h-full lg:w-full lg:max-w-4xl lg:h-auto lg:max-h-[98vh] lg:rounded-lg shadow-2xl flex flex-col">
+          <div className="bg-white w-full h-full lg:w-[95vw] lg:max-w-7xl lg:h-[95vh] lg:rounded-lg shadow-2xl flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-600 to-purple-700 text-white lg:rounded-t-lg">
               <div className="flex items-center space-x-3">
@@ -411,4 +411,4 @@ export function AdminButton() {
       )}
     </>
   )
-} 
+}

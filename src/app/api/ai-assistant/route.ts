@@ -18,64 +18,100 @@ export async function POST(request: NextRequest) {
     const body: RequestBody = await request.json()
     const { message, financialData, isForBudgetTip } = body
 
-    // Para dicas de orçamento, gerar resposta baseada nos dados financeiros
-    if (isForBudgetTip && financialData) {
-      const { receitas, despesas, saldo } = financialData
-      
-      // Lógica para gerar dicas baseadas no perfil financeiro
-      let titulo = ''
-      let descricao = ''
-      
-      const percentualGasto = receitas > 0 ? (despesas / receitas) * 100 : 0
-      
-      if (saldo < 0) {
-        titulo = '🚨 Controle de Gastos Urgente'
-        descricao = `Com gastos de ${percentualGasto.toFixed(1)}% da renda, é crucial reduzir despesas imediatamente. Foque em categorias não essenciais e considere fontes extras de renda.`
-      } else if (percentualGasto > 80) {
-        titulo = '⚠️ Atenção ao Orçamento'
-        descricao = `Você está gastando ${percentualGasto.toFixed(1)}% da sua renda. Tente reduzir para 70% para ter mais folga financeira e criar uma reserva de emergência.`
-      } else if (percentualGasto > 60) {
-        titulo = '💰 Oportunidade de Poupança'
-        descricao = `Com ${percentualGasto.toFixed(1)}% de gastos, você pode direcionar mais recursos para poupança. Tente economizar pelo menos 20% da renda mensalmente.`
-      } else if (saldo > receitas * 0.5) {
-        titulo = '📈 Considere Investimentos'
-        descricao = `Excelente controle financeiro! Com esse saldo positivo, considere diversificar em investimentos para fazer seu dinheiro trabalhar para você.`
-      } else {
-        titulo = '✅ Situação Equilibrada'
-        descricao = `Seu orçamento está bem balanceado. Continue monitorando e considere definir metas específicas para diferentes categorias de gastos.`
-      }
-      
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({
-        response: `Título: ${titulo} | Descrição: ${descricao}`
+        response: 'Desculpe, o assistente IA não está configurado. Entre em contato com o suporte.'
       })
     }
 
-    // Para mensagens gerais do chat, gerar resposta baseada no contexto
-    let response = ''
-    
-    if (message.toLowerCase().includes('orçamento')) {
-      response = 'Para um orçamento eficaz, recomendo a regra 50-30-20: 50% para necessidades, 30% para desejos e 20% para poupança. Revise mensalmente e ajuste conforme necessário.'
-    } else if (message.toLowerCase().includes('investir') || message.toLowerCase().includes('investimento')) {
-      response = 'Antes de investir, certifique-se de ter uma reserva de emergência de 3-6 meses de gastos. Comece com investimentos conservadores como CDB ou Tesouro Direto.'
-    } else if (message.toLowerCase().includes('dívida') || message.toLowerCase().includes('divida')) {
-      response = 'Para quitar dívidas, liste todas por ordem de juros (da maior para menor), quite primeiro as de juros mais altos e negocie quando possível.'
-    } else if (message.toLowerCase().includes('cartão') || message.toLowerCase().includes('cartao')) {
-      response = 'Use o cartão de crédito com consciência: pague sempre o valor total da fatura, monitore os gastos semanalmente e tenha um limite interno menor que o oferecido pelo banco.'
-    } else if (message.toLowerCase().includes('poupança') || message.toLowerCase().includes('poupanca')) {
-      response = 'Automatize sua poupança! Configure uma transferência automática logo após receber o salário. Mesmo valores pequenos, quando consistentes, geram grandes resultados.'
-    } else if (message.toLowerCase().includes('emergência') || message.toLowerCase().includes('emergencia')) {
-      response = 'A reserva de emergência deve cobrir 3-6 meses de gastos essenciais. Mantenha em aplicações líquidas como poupança ou CDB com liquidez diária.'
-    } else {
-      response = 'Olá! Sou seu assistente financeiro. Posso ajudar com dicas sobre orçamento, investimentos, controle de gastos, pagamento de dívidas e planejamento financeiro. Em que posso te ajudar especificamente?'
+    let contextFinanceiro = ''
+    if (financialData) {
+      const { receitas, despesas, saldo } = financialData
+      const percentualGasto = receitas > 0 ? (despesas / receitas) * 100 : 0
+      contextFinanceiro = `\n\nDados financeiros do usuário:\n- Receitas: R$ ${receitas.toLocaleString('pt-BR')}\n- Despesas: R$ ${despesas.toLocaleString('pt-BR')}\n- Saldo: R$ ${saldo.toLocaleString('pt-BR')}\n- Percentual de gastos: ${percentualGasto.toFixed(1)}%\n- Categorias: ${financialData.categorias}`
     }
 
-    return NextResponse.json({ response })
+    // Prompt especializado para dicas de orçamento
+    if (isForBudgetTip && financialData) {
+      const systemPrompt = `Sou o ThFinanceAI, seu consultor financeiro pessoal. Analiso sua situação e forneço dicas práticas e diretas.\n\nResponda APENAS no formato solicitado:\n"Título: [título da dica] | Descrição: [descrição detalhada]"\n\nSeja específico, prático e focado na situação financeira apresentada.`
+
+      const prompt = `${systemPrompt}\n\nAnálise dos dados:${contextFinanceiro}\n\nForneça UMA dica específica para esta situação.`
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            maxOutputTokens: 200,
+            temperature: 0.7,
+          }
+        }),
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        console.error('Gemini API error:', data)
+        return NextResponse.json({ response: `Erro Gemini: ${data.error?.message || JSON.stringify(data)}` })
+      }
+      
+      return NextResponse.json({
+        response: data.candidates?.[0]?.content?.parts?.[0]?.text || 'Não foi possível gerar uma dica no momento.'
+      })
+    }
+
+    // Prompt principal para conversas gerais
+    const systemPrompt = `Sou o ThFinanceAI, seu consultor financeiro pessoal especializado no mercado brasileiro.\n\nComportamento:\n- Respondo APENAS ao que você pergunta, sem informações extras\n- Sou direto, prático e focado na sua pergunta específica\n- Para saudações (bom dia, boa tarde, boa noite, oi, olá), respondo de forma cordial e me apresento brevemente\n- Me identifico naturalmente como ThFinanceAI quando apropriado\n\nEspecialidades:\n- Finanças pessoais e investimentos brasileiros\n- CDB, Tesouro Direto, Selic, fundos, ações\n- Planejamento financeiro e controle de gastos\n- Análise de situações financeiras específicas\n\nSempre considero sua situação financeira atual quando disponível.`
+
+    const userPrompt = `${message}${contextFinanceiro}`
+    const fullPrompt = `${systemPrompt}\n\nPergunta: ${userPrompt}\n\nResposta direta e focada:`
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: fullPrompt
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          maxOutputTokens: 300,
+          temperature: 0.8,
+        }
+      }),
+    })
+    
+    const data = await response.json()
+    
+    if (!response.ok) {
+      console.error('Gemini API error:', data)
+      return NextResponse.json({ response: `Erro Gemini: ${data.error?.message || JSON.stringify(data)}` })
+    }
+    
+    const resposta = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Desculpe, não consegui processar sua pergunta no momento. Tente novamente.'
+    return NextResponse.json({ response: resposta })
 
   } catch (error) {
     console.error('Erro na API do assistente IA:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
+    const fallbackResponse = `Desculpe, estou temporariamente indisponível. 😔 \n\nEnquanto isso, aqui estão algumas dicas rápidas:\n• Use a regra 50-30-20 para seu orçamento\n• Mantenha uma reserva de emergência de 6 meses\n• Quite primeiro as dívidas com juros mais altos\n• Monitore seus gastos semanalmente\n\nTente novamente em alguns instantes!`
+    return NextResponse.json({ response: fallbackResponse })
   }
-} 
+}

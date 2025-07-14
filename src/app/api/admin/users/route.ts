@@ -36,11 +36,13 @@ export async function GET(request: NextRequest) {
     // Buscar usuários do sistema com informações de premium
     console.log('🔍 Admin buscando usuários:', user.email)
     
-    // Primeiro, buscar os perfis com os campos que existem usando client admin
+    // Buscar os perfis com todos os campos necessários usando client admin
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from('profiles')
       .select(`
         id,
+        name,
+        email,
         username,
         created_at,
         updated_at,
@@ -60,20 +62,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao buscar usuários', details: profilesError }, { status: 500 })
     }
 
-    // Buscar informações de email da tabela auth.users usando client admin
-    const { data: authUsers, error: authUsersError } = await supabaseAdmin
-      .from('auth.users')
-      .select('id, email, created_at, email_confirmed_at, last_sign_in_at')
-      .order('created_at', { ascending: false })
-
-    console.log('📊 Resultado da busca auth.users:', { authUsers, authUsersError })
+    // Buscar informações adicionais da tabela auth.users usando client admin
+    const { data: authUsers, error: authUsersError } = await supabaseAdmin.auth.admin.listUsers()
+    
+    console.log('📊 Resultado da busca auth.users via admin API:', { 
+      users: authUsers?.users?.length || 0, 
+      authUsersError 
+    })
 
     // Combinar dados de profiles e auth.users
     const usersWithAuthInfo = profiles?.map(profile => {
-      const authUser = authUsers?.find(au => au.id === profile.id)
+      const authUser = authUsers?.users?.find(au => au.id === profile.id)
       return {
         ...profile,
-        email: authUser?.email || 'N/A',
         email_confirmed_at: authUser?.email_confirmed_at || profile.created_at,
         last_sign_in_at: authUser?.last_sign_in_at || null,
         is_premium: profile.is_premium || false,
@@ -94,4 +95,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-} 
+}
