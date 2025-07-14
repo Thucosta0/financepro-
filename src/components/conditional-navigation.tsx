@@ -17,13 +17,15 @@ export function ConditionalNavigation({ children }: { children: React.ReactNode 
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <div className="lg:pl-64 pt-16 lg:pt-0 min-h-screen bg-gray-50">
-        <main className="px-2 py-4 lg:p-6">
-          {children}
+      <div className="lg:pl-64 pt-16 lg:pt-0 min-h-screen">
+        <main className="px-4 py-6 lg:px-6 lg:py-8 max-w-full overflow-x-hidden">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
-    </>
+    </div>
   )
 }

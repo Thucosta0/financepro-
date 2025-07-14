@@ -67,11 +67,11 @@ export function Navigation() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between px-4 py-3">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b safe-area-top">
+        <div className="flex items-center justify-between px-4 py-3 h-16">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 touch-manipulation"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
           >
             {mobileMenuOpen ? (
               <X className="h-6 w-6 text-gray-600" />
@@ -79,10 +79,10 @@ export function Navigation() {
               <Menu className="h-6 w-6 text-gray-600" />
             )}
           </button>
-          <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate mx-4">
             FinancePRO
           </h1>
-          <Link href="/perfil" className="p-2 rounded-lg hover:bg-gray-100 touch-manipulation">
+          <Link href="/perfil" className="p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0">
             <User className="h-5 w-5 text-gray-600" />
           </Link>
         </div>
@@ -113,19 +113,19 @@ export function Navigation() {
                 </div>
               )}
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1">
               <div className="space-y-1">
                 {displayUsername ? (
                   <>
-                    <p className="text-sm text-purple-600 truncate font-medium">
+                    <p className="text-sm text-purple-600 font-medium">
                       @{displayUsername}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-gray-500">
                       {displayEmail}
                     </p>
                   </>
                 ) : (
-                  <p className="text-sm text-gray-700 truncate font-medium">
+                  <p className="text-sm text-gray-700 font-medium">
                     {displayEmail}
                   </p>
                 )}
@@ -193,7 +193,7 @@ export function Navigation() {
         
         {/* Menu panel */}
         <div className={`
-          fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl transform transition-transform duration-300
+          fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl transform transition-transform duration-300 overflow-y-auto
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}>
           {/* Header */}
@@ -229,19 +229,19 @@ export function Navigation() {
                   </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 <div className="space-y-1">
                   {displayUsername ? (
                     <>
-                      <p className="text-base text-purple-600 truncate font-medium">
+                      <p className="text-base text-purple-600 font-medium">
                         @{displayUsername}
                       </p>
-                      <p className="text-sm text-gray-500 truncate">
+                      <p className="text-sm text-gray-500">
                         {displayEmail}
                       </p>
                     </>
                   ) : (
-                    <p className="text-base text-gray-700 truncate font-medium">
+                    <p className="text-base text-gray-700 font-medium">
                       {displayEmail}
                     </p>
                   )}
@@ -296,4 +296,4 @@ export function Navigation() {
       </div>
     </>
   )
-} 
+}

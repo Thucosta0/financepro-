@@ -356,8 +356,8 @@ export default function OrcamentoPage() {
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3 flex-1">
                             <div className="text-xl">{orcamento.categoriaIcon}</div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-gray-900 truncate">{orcamento.categoria}</h4>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900">{orcamento.categoria}</h4>
                               <p className="text-sm text-gray-600">
                                 {formatarValor(orcamento.gasto)} de {formatarValor(orcamento.limite)}
                               </p>
@@ -497,4 +497,4 @@ export default function OrcamentoPage() {
       </div>
     </ProtectedRoute>
   )
-} 
+}

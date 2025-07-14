@@ -10,10 +10,22 @@ const nextConfig: NextConfig = {
     // Ignorar erros de TypeScript durante o build (apenas para deploy)
     ignoreBuildErrors: true,
   },
-  // Configurações PWA
+  // Permitir requisições cross-origin em desenvolvimento
+  allowedDevOrigins: ['192.168.18.178'],
+  
+  // Otimizações de performance
   experimental: {
-    webVitalsAttribution: ['CLS', 'LCP'],
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react'],
   },
+  
+  // Configurações de compilação
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
+  },
+
   // Headers para melhorar performance e segurança
   async headers() {
     return [
@@ -39,12 +51,8 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/manifest.json',
+        source: '/_next/static/css/(.*)',
         headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',

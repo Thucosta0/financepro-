@@ -130,4 +130,23 @@
   .smooth-scroll {
     scroll-behavior: smooth;
   }
+  
+  /* Previne overscroll em mobile */
+  html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Previne pull-to-refresh e bounce effect apenas em mobile */
+  @media (max-width: 768px) {
+    body {
+      overscroll-behavior-y: none;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+  
+  #__next {
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
 }

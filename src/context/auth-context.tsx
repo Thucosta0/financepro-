@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { supabase, getCurrentUser, signIn, signUp, signOut } from '@/lib/supabase-client'
+import { debugLog } from '@/lib/debug'
 import type { User } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -104,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Se for username, buscar email primeiro
         
         try {
-          console.log('🔍 Buscando username:', emailOrUsername.trim())
+          debugLog.info('Buscando username:', emailOrUsername.trim())
           
           // Buscar username via API route
           const response = await fetch('/api/auth/find-user', {
@@ -118,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const result = await response.json()
           
           if (!response.ok) {
-            console.error('❌ Erro ao buscar username:', result.error)
+            debugLog.error('Erro ao buscar username:', result.error)
             return { success: false, message: result.error || 'Nome de usuário não encontrado' }
           }
           
@@ -126,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return { success: false, message: 'Nome de usuário não encontrado' }
           }
           
-          console.log('✅ Email encontrado para username:', result.email)
+          debugLog.success('Email encontrado para username:', result.email)
           
           // Tentar login com o email encontrado
           const loginResult = await signIn(result.email, password)
@@ -232,4 +233,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
-} 
+}

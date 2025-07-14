@@ -306,8 +306,8 @@ export default function CategoriasPage() {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3 flex-1">
                         <div className="text-2xl">{categoria.icon}</div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate">{categoria.name}</h3>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{categoria.name}</h3>
                           <p className="text-xs text-gray-600 capitalize">
                             {categoria.type === 'income' ? '💰 Receita' : '💸 Despesa'}
                           </p>
@@ -588,4 +588,4 @@ export default function CategoriasPage() {
       </div>
     </ProtectedRoute>
   )
-} 
+}

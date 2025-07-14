@@ -244,10 +244,10 @@ export default function CartoesPage() {
                       style={{ backgroundColor: cartao.color }}
                     >
                       <div className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
                             <div className="text-lg">{getCardIcon(cartao.type)}</div>
-                            <h3 className="font-semibold text-sm truncate">{cartao.name}</h3>
+                            <h3 className="font-semibold text-sm">{cartao.name}</h3>
                           </div>
                           <p className="text-xs opacity-90">{cartao.bank}</p>
                           {cartao.last_digits && (
