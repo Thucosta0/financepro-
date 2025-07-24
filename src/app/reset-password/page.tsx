@@ -43,13 +43,13 @@ export default function ResetPasswordPage() {
             const { error } = await supabase.auth.exchangeCodeForSession(code)
             
             if (error) {
-              console.error('Error exchanging code for session:', error)
+              // Silenciar erro de troca de código
             } else {
               setIsValidToken(true)
               return
             }
           } catch (error) {
-            console.error('Error with code exchange:', error)
+            // Silenciar erro de troca de código
           }
         }
 
@@ -62,13 +62,13 @@ export default function ResetPasswordPage() {
             })
 
             if (error) {
-              console.error('Error setting session with tokens:', error)
+              // Silenciar erro de configuração de sessão
             } else {
               setIsValidToken(true)
               return
             }
           } catch (error) {
-            console.error('Error with token session:', error)
+            // Silenciar erro de sessão com token
           }
         }
 
@@ -81,13 +81,13 @@ export default function ResetPasswordPage() {
             })
 
             if (error) {
-              console.error('Error verifying OTP:', error)
+              // Silenciar erro de verificação OTP
             } else {
               setIsValidToken(true)
               return
             }
           } catch (error) {
-            console.error('Error with OTP verification:', error)
+            // Silenciar erro de verificação OTP
           }
         }
 
@@ -96,13 +96,13 @@ export default function ResetPasswordPage() {
           const { data: { session }, error } = await supabase.auth.getSession()
           
           if (error) {
-            console.error('Error getting session:', error)
+            // Silenciar erro de obtenção de sessão
           } else if (session?.user) {
             setIsValidToken(true)
             return
           }
         } catch (error) {
-          console.error('Error checking session:', error)
+          // Silenciar erro de verificação de sessão
         }
 
         // Se chegou até aqui, o link não é válido
@@ -144,7 +144,7 @@ export default function ResetPasswordPage() {
       })
 
       if (error) {
-        console.error('Error updating password:', error)
+        // Silenciar erro de atualização de senha
         setFeedback({ type: 'error', message: 'Erro ao redefinir senha. Tente novamente.' })
         setIsLoading(false)
         return
@@ -158,7 +158,7 @@ export default function ResetPasswordPage() {
       }, 2000)
 
     } catch (error) {
-      console.error('Error resetting password:', error)
+      // Silenciar erro de reset de senha
       setFeedback({ type: 'error', message: 'Erro ao redefinir senha. Tente novamente.' })
     } finally {
       setIsLoading(false)
@@ -362,4 +362,4 @@ export default function ResetPasswordPage() {
       </div>
     </div>
   )
-} 
+}

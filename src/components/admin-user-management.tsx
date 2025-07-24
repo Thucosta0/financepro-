@@ -48,7 +48,7 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
         setUsers(data.users || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
+      // Erro silencioso ao carregar usuários
     } finally {
       setLoading(false)
     }
@@ -98,15 +98,10 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
 
       const { data: { session } } = await import('@/lib/supabase-client').then(m => m.supabase.auth.getSession())
       
-      console.log('🔑 Sessão atual:', session?.user?.email, 'Token existe:', !!session?.access_token)
-      
       if (!session?.access_token) {
-        console.error('Nenhum token de acesso encontrado')
         alert('❌ Erro: Token de acesso não encontrado. Faça login novamente.')
         return
       }
-
-      console.log(`🔄 Executando ação: ${action} para usuário: ${userId}`)
 
       const response = await fetch('/api/admin/users/action', {
         method: 'POST',
@@ -121,7 +116,6 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
       })
       
       const responseData = await response.json()
-      console.log('📊 Resposta da API:', responseData)
       
       if (response.ok) {
         // Sucesso - mostrar mensagem e recarregar lista
@@ -130,11 +124,9 @@ export function AdminUserManagement({ onBack }: UserManagementProps) {
         await fetchUsers() // Recarregar lista
       } else {
         // Erro - mostrar detalhes
-        console.error('❌ Erro na API:', responseData)
         alert(`❌ Erro: ${responseData.error || 'Erro desconhecido'}`)
       }
     } catch (error) {
-      console.error(`❌ Erro ao ${action} usuário:`, error)
       alert(`❌ Erro de conexão: ${error}`)
     } finally {
       setActionLoading(null)

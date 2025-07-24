@@ -93,7 +93,6 @@ export function BudgetModal({ isOpen, onClose, selectedCategory }: BudgetModalPr
 
       onClose()
     } catch (error) {
-      console.error('Erro ao salvar orçamento:', error)
       alert('Erro ao salvar orçamento. Tente novamente.')
     } finally {
       setIsSubmitting(false)
@@ -281,4 +280,4 @@ export function BudgetModal({ isOpen, onClose, selectedCategory }: BudgetModalPr
       </div>
     </div>
   )
-} 
+}

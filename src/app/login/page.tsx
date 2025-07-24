@@ -62,7 +62,7 @@ export default function LoginPage() {
             router.push('/dashboard')
           }
         } catch (error) {
-          console.error('Erro ao verificar dados do usuário:', error)
+          // Silenciar erro de verificação de dados
           // Em caso de erro, redirecionar para dashboard
           router.push('/dashboard')
         }
@@ -108,14 +108,14 @@ export default function LoginPage() {
       })
 
       if (error) {
-        console.error('Error resending verification email:', error)
+        // Silenciar erro de reenvio de email
         setFeedback({ type: 'error', message: 'Erro ao reenviar email. Tente novamente.' })
       } else {
         setFeedback({ type: 'success', message: 'Email de confirmação reenviado! Verifique sua caixa de entrada.' })
         setShowResendVerification(false)
       }
     } catch (error) {
-      console.error('Error resending verification email:', error)
+      // Silenciar erro de reenvio de email
       setFeedback({ type: 'error', message: 'Erro ao reenviar email. Tente novamente.' })
     } finally {
       setIsResendingVerification(false)
@@ -150,7 +150,7 @@ export default function LoginPage() {
       })
 
       if (error) {
-        console.error('Error sending reset email:', error)
+        // Silenciar erro de envio de reset
         setFeedback({ type: 'error', message: 'Erro ao enviar email de recuperação. Tente novamente.' })
       } else {
         setFeedback({ 
@@ -164,7 +164,7 @@ export default function LoginPage() {
         }, 3000)
       }
     } catch (error) {
-      console.error('Error resetting password:', error)
+      // Silenciar erro de reset de senha
       setFeedback({ type: 'error', message: 'Erro ao enviar email de recuperação. Tente novamente.' })
     } finally {
       setIsResetting(false)
@@ -613,4 +613,4 @@ export default function LoginPage() {
       </div>
     </>
   )
-} 
+}

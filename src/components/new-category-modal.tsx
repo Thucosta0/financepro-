@@ -102,7 +102,6 @@ export function NewCategoryModal({ isOpen, onClose, editingCategory }: NewCatego
 
       onClose()
     } catch (error) {
-      console.error('Erro ao salvar categoria:', error)
       alert('Erro ao salvar categoria. Tente novamente.')
     }
   }
@@ -249,4 +248,4 @@ export function NewCategoryModal({ isOpen, onClose, editingCategory }: NewCatego
       </div>
     </div>
   )
-} 
+}

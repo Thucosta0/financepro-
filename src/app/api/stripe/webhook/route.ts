@@ -25,14 +25,11 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!
     )
   } catch (err) {
-    console.error('Erro na verificação do webhook:', err)
     return NextResponse.json(
       { error: 'Webhook signature verification failed' },
       { status: 400 }
     )
   }
-
-  console.log(`Evento recebido: ${event.type}`)
 
   try {
     switch (event.type) {
@@ -61,12 +58,12 @@ export async function POST(req: NextRequest) {
         break
 
       default:
-        console.log(`Evento não tratado: ${event.type}`)
+        // Evento não tratado
+        break
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Erro ao processar webhook:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -75,8 +72,6 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  console.log('Checkout completed:', session.id)
-  
   if (session.mode === 'subscription' && stripe) {
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
     await handleSubscriptionCreated(subscription)
@@ -87,7 +82,6 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
   const userId = subscription.metadata.userId
   
   if (!userId) {
-    console.error('UserId não encontrado nos metadados da assinatura')
     return
   }
 
@@ -112,9 +106,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     })
 
   if (error) {
-    console.error('Erro ao criar/atualizar assinatura:', error)
-  } else {
-    console.log('Assinatura criada/atualizada com sucesso para o usuário:', userId)
+    // Erro silencioso ao criar/atualizar assinatura
   }
 }
 
@@ -130,7 +122,6 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       .single()
     
     if (!existingSubscription) {
-      console.error('Usuário não encontrado para a assinatura:', subscription.id)
       return
     }
   }
@@ -150,9 +141,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     .eq('stripe_subscription_id', subscription.id)
 
   if (error) {
-    console.error('Erro ao atualizar assinatura:', error)
-  } else {
-    console.log('Assinatura atualizada com sucesso:', subscription.id)
+    // Erro silencioso ao atualizar assinatura
   }
 }
 
@@ -166,9 +155,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     .eq('stripe_subscription_id', subscription.id)
 
   if (error) {
-    console.error('Erro ao cancelar assinatura:', error)
-  } else {
-    console.log('Assinatura cancelada com sucesso:', subscription.id)
+    // Erro silencioso ao cancelar assinatura
   }
 }
 
@@ -180,8 +167,6 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  console.log('Payment failed for invoice:', invoice.id)
-  
   if ((invoice as any).subscription) {
     const { error } = await supabase
       .from('subscriptions')
@@ -191,7 +176,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
       .eq('stripe_subscription_id', (invoice as any).subscription as string)
 
     if (error) {
-      console.error('Erro ao atualizar status para past_due:', error)
+      // Erro silencioso ao atualizar status para past_due
     }
   }
-} 
+}

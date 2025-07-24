@@ -45,7 +45,7 @@ export default function BemVindoContent() {
             .single()
 
           if (profile && !error) {
-            console.log('✅ Perfil encontrado no banco:', profile)
+            // Perfil encontrado no banco
             setUserProfile(profile)
             setIsLoading(false)
             return
@@ -53,14 +53,14 @@ export default function BemVindoContent() {
         }
 
         // Fallback: tentar múltiplas estratégias
-        console.log('⚠️ Usuário não logado ou perfil não encontrado, usando estratégias de fallback...')
+        // Usuário não logado ou perfil não encontrado, usando estratégias de fallback
 
         // 1. Buscar nos parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search)
         const nameFromUrl = urlParams.get('name')
         
         if (nameFromUrl) {
-          console.log('1️⃣ Nome encontrado na URL:', nameFromUrl)
+          // Nome encontrado na URL
           setUserProfile({ 
             name: nameFromUrl, 
             email: urlParams.get('email') || 'email@exemplo.com' 
@@ -77,7 +77,7 @@ export default function BemVindoContent() {
           const stored = localStorage.getItem(key)
           if (stored) {
             nameFromStorage = stored
-            console.log(`2️⃣ Nome encontrado no localStorage (${key}):`, stored)
+            // Nome encontrado no localStorage
             break
           }
         }
@@ -94,7 +94,7 @@ export default function BemVindoContent() {
         // 3. Verificar se há usuário autenticado no Supabase (sem perfil)
         if (user) {
           const emailName = user.email?.split('@')[0] || 'usuário'
-          console.log('3️⃣ Usuário encontrado mas sem perfil, usando email:', emailName)
+          // Usuário encontrado mas sem perfil, usando email
           setUserProfile({ 
             name: emailName, 
             email: user.email || 'email@exemplo.com' 
@@ -104,7 +104,7 @@ export default function BemVindoContent() {
         }
 
         // 4. Fallback final amigável
-        console.log('4️⃣ Usando fallback final')
+        // Usando fallback final
         setUserProfile({ 
           name: 'Amigo', 
           email: 'email@exemplo.com' 
@@ -112,10 +112,10 @@ export default function BemVindoContent() {
         setIsLoading(false)
 
       } catch (error) {
-        console.error('❌ Erro ao buscar perfil do usuário:', error)
-        setUserProfile({ 
-          name: 'Amigo', 
-          email: 'email@exemplo.com' 
+         // Silenciar erro de busca de perfil
+         setUserProfile({ 
+           name: 'Amigo', 
+           email: 'email@exemplo.com' 
         })
         setIsLoading(false)
       }
@@ -388,4 +388,4 @@ export default function BemVindoContent() {
       </div>
     </>
   )
-} 
+}

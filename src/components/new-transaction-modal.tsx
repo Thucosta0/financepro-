@@ -11,7 +11,7 @@ interface NewTransactionModalProps {
 }
 
 export function NewTransactionModal({ isOpen, onClose }: NewTransactionModalProps) {
-  const { categories, cards, addTransaction } = useFinancial()
+  const { categories, cards, addTransaction, refreshTransactions } = useFinancial()
   const { canPerformAction, isTrialExpired } = useSubscription()
   const [formData, setFormData] = useState({
     description: '',
@@ -89,7 +89,7 @@ export function NewTransactionModal({ isOpen, onClose }: NewTransactionModalProp
     }
   }, [isOpen, isTrialExpired, onClose])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     // Verificar novamente se o trial expirou antes de submeter
@@ -155,26 +155,33 @@ export function NewTransactionModal({ isOpen, onClose }: NewTransactionModalProp
       notes: formData.notes || undefined
     }
 
-    addTransaction(transactionData)
+    try {
+      await addTransaction(transactionData)
+      
+      // Atualizar a lista de transações
+      await refreshTransactions()
+      
+      // Reset form apenas após sucesso
+      setFormData({
+        description: '',
+        totalAmount: '',
+        amount: '',
+        type: 'expense',
+        category: '',
+        card: '',
+        date: new Date().toISOString().split('T')[0],
+        dueDate: '',
+        format: '',
+        startDate: '',
+        endDate: '',
+        installments: 0,
+        notes: ''
+      })
 
-    // Reset form
-    setFormData({
-      description: '',
-      totalAmount: '',
-      amount: '',
-      type: 'expense',
-      category: '',
-      card: '',
-      date: new Date().toISOString().split('T')[0],
-      dueDate: '',
-      format: '',
-      startDate: '',
-      endDate: '',
-      installments: 0,
-      notes: ''
-    })
-
-    onClose()
+      onClose()
+    } catch (error) {
+      alert('Erro ao adicionar transação. Tente novamente.')
+    }
   }
 
   const formatCardName = (card: any) => {
@@ -582,4 +589,4 @@ export function NewTransactionModal({ isOpen, onClose }: NewTransactionModalProp
       </div>
     </div>
   )
-} 
+}

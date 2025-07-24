@@ -60,7 +60,7 @@ export default function PerfilPage() {
         .single()
 
       if (error) {
-        console.error('Error loading profile:', error)
+        // Silenciar erro de carregamento de perfil
         setFeedback({ type: 'error', message: 'Erro ao carregar perfil' })
         return
       }
@@ -74,7 +74,7 @@ export default function PerfilPage() {
         })
       }
     } catch (error) {
-      console.error('Error loading profile:', error)
+      // Silenciar erro de carregamento de perfil
       setFeedback({ type: 'error', message: 'Erro ao carregar perfil' })
     } finally {
       setIsLoading(false)
@@ -153,7 +153,7 @@ export default function PerfilPage() {
       console.log('💾 [PERFIL] Resultado da atualização:', { error })
 
       if (error) {
-        console.error('❌ [PERFIL] Error updating profile:', error)
+        // Silenciar erro de atualização de perfil
         setFeedback({ type: 'error', message: 'Erro ao salvar perfil' })
         return
       }
@@ -187,7 +187,7 @@ export default function PerfilPage() {
       // Recarregar dados
       await loadProfile()
     } catch (error) {
-      console.error('Error updating profile:', error)
+      // Silenciar erro de atualização de perfil
       setFeedback({ type: 'error', message: 'Erro ao salvar perfil' })
     } finally {
       setIsSaving(false)
@@ -252,7 +252,7 @@ export default function PerfilPage() {
       })
 
     } catch (error) {
-      console.error('Error changing password:', error)
+      // Silenciar erro de mudança de senha
       setPasswordFeedback({ type: 'error', message: 'Erro ao alterar senha. Tente novamente.' })
     } finally {
       setIsChangingPassword(false)
@@ -306,7 +306,7 @@ export default function PerfilPage() {
         })
 
       if (uploadError) {
-        console.error('Error uploading avatar:', uploadError)
+        // Silenciar erro de upload de avatar
         setFeedback({ type: 'error', message: 'Erro ao fazer upload da imagem' })
         return
       }
@@ -323,7 +323,7 @@ export default function PerfilPage() {
         .eq('id', user.id)
 
       if (updateError) {
-        console.error('Error updating avatar URL:', updateError)
+        // Silenciar erro de atualização de URL do avatar
         setFeedback({ type: 'error', message: 'Erro ao salvar foto de perfil' })
         return
       }
@@ -333,7 +333,7 @@ export default function PerfilPage() {
       setFeedback({ type: 'success', message: 'Foto de perfil atualizada com sucesso!' })
 
     } catch (error) {
-      console.error('Error uploading avatar:', error)
+      // Silenciar erro de upload de avatar
       setFeedback({ type: 'error', message: 'Erro ao fazer upload da imagem' })
     } finally {
       setIsUploadingAvatar(false)

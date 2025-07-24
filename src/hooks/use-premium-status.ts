@@ -42,7 +42,6 @@ export function usePremiumStatus() {
           .single()
 
         if (error) {
-          console.error('Erro ao verificar status premium:', error)
           setStatus({
             isPremium: false,
             premiumUntil: null,
@@ -68,7 +67,6 @@ export function usePremiumStatus() {
         })
 
       } catch (error) {
-        console.error('Erro ao verificar status premium:', error)
         setStatus({
           isPremium: false,
           premiumUntil: null,
@@ -82,4 +80,4 @@ export function usePremiumStatus() {
   }, [user])
 
   return status
-} 
+}

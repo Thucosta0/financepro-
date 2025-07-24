@@ -70,8 +70,8 @@ export default function CategoriasPage() {
       try {
         await deleteCategory(categoryId)
       } catch (error) {
-        console.error('Erro ao excluir categoria:', error)
-        alert('Erro ao excluir categoria. Verifique se não há transações vinculadas a ela.')
+         // Silenciar erro de exclusão
+         alert('Erro ao excluir categoria. Verifique se não há transações vinculadas a ela.')
       }
     }
   }

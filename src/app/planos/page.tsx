@@ -38,7 +38,7 @@ function PlanosContent() {
     const stripe = await getStripe()
     
     if (!stripe) {
-      console.error('❌ Stripe não configurado')
+      // Stripe não configurado
       alert('Sistema de pagamentos não configurado. Entre em contato com o suporte.')
       return
     }
@@ -62,7 +62,7 @@ function PlanosContent() {
       const { sessionId, error } = await response.json()
 
       if (error) {
-        console.error('Erro ao criar sessão:', error)
+        // Erro ao criar sessão
         alert('Erro ao processar pagamento. Tente novamente.')
         return
       }
@@ -71,12 +71,12 @@ function PlanosContent() {
       if (stripe) {
         const { error: stripeError } = await (stripe as any).redirectToCheckout({ sessionId })
         if (stripeError) {
-          console.error('Erro do Stripe:', stripeError)
+          // Erro do Stripe
           alert('Erro ao redirecionar para pagamento.')
         }
       }
     } catch (error) {
-      console.error('Erro:', error)
+      // Erro genérico
       alert('Erro inesperado. Tente novamente.')
     } finally {
       setLoadingState(null)
@@ -552,4 +552,4 @@ export default function PlanosPage() {
       <PlanosContent />
     </Suspense>
   )
-} 
+}

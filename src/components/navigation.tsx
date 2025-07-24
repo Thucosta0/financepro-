@@ -51,7 +51,7 @@ export function Navigation() {
         setUserProfile(data)
       }
     } catch (error) {
-      console.error('Error loading user profile:', error)
+      // Erro silencioso ao carregar perfil do usuário
     }
   }
 

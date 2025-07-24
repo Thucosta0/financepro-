@@ -83,7 +83,6 @@ export function AIAssistant({ financialData }: AIAssistantProps) {
         throw new Error(data.error || 'Erro ao enviar mensagem')
       }
     } catch (error) {
-      console.error('Erro no assistente IA:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Desculpe, o ThFinanceAI está temporariamente indisponível. Tente novamente em alguns instantes. 😔',

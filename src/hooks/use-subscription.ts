@@ -113,9 +113,8 @@ export const useSubscription = () => {
       setError(null)
 
     } catch (err) {
-      console.error('Erro ao calcular subscription:', err)
-      
-      // Fallback: criar subscription padrão para trial
+      // Silenciar erro de cálculo de subscription
+      return null     // Fallback: criar subscription padrão para trial
       const now = new Date()
       const trialEnd = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
       
@@ -247,4 +246,4 @@ export const useSubscription = () => {
     getTrialDaysRemaining,
     getStatusText,
   }
-} 
+}

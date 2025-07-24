@@ -109,7 +109,7 @@ export const getCurrentUser = async () => {
   if (error) {
     // Não logar erro se for apenas sessão ausente (situação normal)
     if (error.message !== 'Auth session missing!') {
-      console.error('Error getting user:', error)
+      // Silenciar erro de obtenção de usuário
     }
     return null
   }
@@ -119,7 +119,7 @@ export const getCurrentUser = async () => {
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut()
   if (error) {
-    console.error('Error signing out:', error)
+    // Silenciar erro de logout
     return false
   }
   return true
@@ -132,7 +132,7 @@ export const signIn = async (email: string, password: string) => {
   })
   
   if (error) {
-    console.error('Error signing in:', error)
+    // Silenciar erro de login
     return { user: null, error }
   }
   
@@ -179,7 +179,7 @@ export const signUp = async (email: string, password: string, name: string, user
   })
   
   if (error) {
-    console.error('Error signing up:', error)
+    // Silenciar erro de cadastro
     // Limpar o nome se deu erro
     if (typeof window !== 'undefined') {
       localStorage.removeItem('welcomeUserName')
@@ -204,16 +204,16 @@ export const signUp = async (email: string, password: string, name: string, user
         .select()
       
       if (updateError) {
-        console.error('❌ Erro ao atualizar username:', updateError)
+        // Erro ao atualizar username
       } else {
         console.log('✅ Username salvo com sucesso:', updateResult)
       }
     } catch (profileError) {
-      console.error('❌ Erro ao salvar username no perfil:', profileError)
+      // Erro ao salvar username no perfil
     }
   }
   
   return { user: data.user, error: null }
 }
 
-export default supabase 
+export default supabase

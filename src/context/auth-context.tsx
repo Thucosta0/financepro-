@@ -22,15 +22,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthState = async () => {
     try {
+      console.log('🔍 [AUTH DEBUG] Verificando estado de autenticação...')
       const currentUser = await getCurrentUser()
+      console.log('✅ [AUTH DEBUG] Usuário encontrado:', currentUser ? { id: currentUser.id, email: currentUser.email } : 'null')
       setUser(currentUser)
     } catch (error) {
+      console.log('❌ [AUTH DEBUG] Erro na verificação de auth:', error)
       // Não logar erro se for apenas sessão ausente (situação normal)
       if (error && typeof error === 'object' && 'message' in error && error.message !== 'Auth session missing!') {
-        console.error('Error checking auth state:', error)
+        // Silenciar erro de verificação de auth
       }
       setUser(null)
     } finally {
+      console.log('🏁 [AUTH DEBUG] Finalizando verificação de auth, isLoading = false')
       setIsLoading(false)
     }
   }
@@ -141,14 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return { success: true }
           }
         } catch (usernameError) {
-          console.error('❌ [AUTH] Erro na busca do username:', usernameError)
+          // Erro na busca do username
           return { success: false, message: 'Erro ao buscar nome de usuário' }
         }
       }
       
       return { success: false, message: 'Erro inesperado ao fazer login' }
     } catch (error) {
-      console.error('❌ [AUTH] Erro no login:', error)
+      // Silenciar erro de login
       return { success: false, message: 'Erro de conexão' }
     } finally {
       setIsLoading(false)
@@ -195,7 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       return { success: false, message: 'Erro inesperado ao criar conta' }
     } catch (error) {
-      console.error('Register error:', error)
+      // Silenciar erro de registro
       return { success: false, message: 'Erro de conexão' }
     } finally {
       setIsLoading(false)
@@ -208,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signOut()
       setUser(null)
     } catch (error) {
-      console.error('Logout error:', error)
+      // Silenciar erro de logout
     } finally {
       setIsLoading(false)
     }

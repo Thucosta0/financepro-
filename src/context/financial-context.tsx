@@ -101,7 +101,7 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
         loadBudgets()
       ])
     } catch (error) {
-      console.error('Error loading data:', error)
+      // Silenciar erro de carregamento
     } finally {
       setIsLoading(false)
     }
@@ -117,7 +117,7 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .order('name')
     
     if (error) {
-      console.error('Error loading categories:', error)
+      // Silenciar erro de carregamento de categorias
       return
     }
     
@@ -134,7 +134,7 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .order('name')
     
     if (error) {
-      console.error('Error loading cards:', error)
+      // Silenciar erro de carregamento de cartões
       return
     }
     
@@ -148,6 +148,8 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       setTransactionsLoading(true)
     }
     
+    console.log('🔍 Carregando transações para usuário:', user.id, 'página:', page)
+    
     const { data, error } = await supabase
       .from('transactions')
       .select(`
@@ -160,12 +162,14 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .range(page * TRANSACTIONS_PER_PAGE, (page + 1) * TRANSACTIONS_PER_PAGE - 1)
     
     if (error) {
-      console.error('Error loading transactions:', error)
+      console.error('❌ Erro ao carregar transações:', error)
       setTransactionsLoading(false)
       return
     }
     
     const newTransactions = data || []
+    console.log('📊 Transações carregadas:', newTransactions.length)
+    console.log('💰 Tipos de transações:', newTransactions.map(t => ({ id: t.id, type: t.type, description: t.description, amount: t.amount })))
     
     if (reset || page === 0) {
       setTransactions(newTransactions)
@@ -199,7 +203,7 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .order('month', { ascending: false })
     
     if (error) {
-      console.error('Error loading budgets:', error)
+      // Silenciar erro de carregamento de orçamentos
       return
     }
     
@@ -220,9 +224,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error adding category:', error)
-      throw error
-    }
+       // Silenciar erro de adição de categoria
+       throw error
+     }
     
     setCategories(prev => [...prev, data])
   }
@@ -239,9 +243,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error updating category:', error)
-      throw error
-    }
+       // Silenciar erro de atualização de categoria
+       throw error
+     }
     
     setCategories(prev => prev.map(cat => cat.id === id ? data : cat))
     
@@ -272,9 +276,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id)
     
     if (error) {
-      console.error('Error deleting category:', error)
-      throw error
-    }
+       // Silenciar erro de exclusão de categoria
+       throw error
+     }
     
     setCategories(prev => prev.filter(cat => cat.id !== id))
     // OTIMIZAÇÃO: Não recarregar transações - o RLS do banco já impede visualização
@@ -295,9 +299,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error adding card:', error)
-      throw error
-    }
+       // Silenciar erro de adição de cartão
+       throw error
+     }
     
     setCards(prev => [...prev, data])
   }
@@ -314,9 +318,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error updating card:', error)
-      throw error
-    }
+       // Silenciar erro de atualização de cartão
+       throw error
+     }
     
     setCards(prev => prev.map(card => card.id === id ? data : card))
     
@@ -340,9 +344,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id)
     
     if (error) {
-      console.error('Error deleting card:', error)
-      throw error
-    }
+       // Silenciar erro de exclusão de cartão
+       throw error
+     }
     
     setCards(prev => prev.filter(card => card.id !== id))
     // OTIMIZAÇÃO: Não recarregar transações - o RLS do banco já impede visualização
@@ -404,9 +408,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
         `)
       
       if (error) {
-        console.error('Error adding installment transactions:', error)
-        throw error
-      }
+         // Silenciar erro de adição de transações parceladas
+         throw error
+       }
       
       // Atualizar estado com todas as parcelas
       setTransactions(prev => [...(data || []), ...prev])
@@ -436,9 +440,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
         .single()
       
       if (error) {
-        console.error('Error adding transaction:', error)
-        throw error
-      }
+         // Silenciar erro de adição de transação
+         throw error
+       }
       
       setTransactions(prev => [data, ...prev])
     }
@@ -479,9 +483,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error updating transaction:', error)
-      throw error
-    }
+       // Silenciar erro de atualização de transação
+       throw error
+     }
     
     setTransactions(prev => prev.map(trans => trans.id === id ? data : trans))
   }
@@ -496,9 +500,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id)
     
     if (error) {
-      console.error('Error deleting transaction:', error)
-      throw error
-    }
+       // Silenciar erro de exclusão de transação
+       throw error
+     }
     
     setTransactions(prev => prev.filter(trans => trans.id !== id))
   }
@@ -522,9 +526,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error adding budget:', error)
-      throw error
-    }
+       // Silenciar erro de adição de orçamento
+       throw error
+     }
     
     setBudgets(prev => [...prev, data])
   }
@@ -544,9 +548,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .single()
     
     if (error) {
-      console.error('Error updating budget:', error)
-      throw error
-    }
+       // Silenciar erro de atualização de orçamento
+       throw error
+     }
     
     setBudgets(prev => prev.map(budget => budget.id === id ? data : budget))
   }
@@ -561,9 +565,9 @@ export function FinancialProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id)
     
     if (error) {
-      console.error('Error deleting budget:', error)
-      throw error
-    }
+       // Silenciar erro de exclusão de orçamento
+       throw error
+     }
     
     setBudgets(prev => prev.filter(budget => budget.id !== id))
   }
@@ -653,4 +657,4 @@ export function useFinancial() {
     throw new Error('useFinancial must be used within a FinancialProvider')
   }
   return context
-} 
+}

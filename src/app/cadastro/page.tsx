@@ -85,13 +85,13 @@ export default function CadastroPage() {
       })
 
       if (error) {
-        console.error('Error resending email:', error)
+        // Silenciar erro de reenvio de email
         setFeedback({ type: 'error', message: 'Erro ao reenviar email. Tente novamente.' })
       } else {
         setFeedback({ type: 'success', message: 'Email reenviado! Verifique sua caixa de entrada.' })
       }
     } catch (error) {
-      console.error('Error resending email:', error)
+      // Silenciar erro de reenvio de email
       setFeedback({ type: 'error', message: 'Erro ao reenviar email. Tente novamente.' })
     } finally {
       setIsResendingEmail(false)
@@ -614,4 +614,4 @@ export default function CadastroPage() {
       </div>
     </>
   )
-} 
+}

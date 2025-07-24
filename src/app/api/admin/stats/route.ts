@@ -19,17 +19,13 @@ export async function GET(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     
     if (authError || !user) {
-      console.error('❌ Erro de autenticação:', authError)
       return NextResponse.json({ error: 'Usuário não autenticado' }, { status: 401 })
     }
 
     // Verificar se é admin
     if (user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      console.error('❌ Acesso negado para:', user.email)
       return NextResponse.json({ error: 'Acesso negado - apenas administradores' }, { status: 403 })
     }
-
-    console.log('🔍 Admin carregando estatísticas:', user.email)
 
     // Buscar estatísticas do sistema usando client admin (bypassa RLS)
     const [
@@ -44,37 +40,10 @@ export async function GET(request: NextRequest) {
       supabaseAdmin.from('cards').select('id, name, type, created_at')
     ])
 
-    console.log('📊 Resultados das consultas:', {
-      users: usersResult.data?.length || 0,
-      transactions: transactionsResult.data?.length || 0,
-      categories: categoriesResult.data?.length || 0,
-      cards: cardsResult.data?.length || 0,
-      errors: {
-        users: usersResult.error,
-        transactions: transactionsResult.error,
-        categories: categoriesResult.error,
-        cards: cardsResult.error
-      },
-      sampleData: {
-        user: usersResult.data?.[0] || null,
-        transaction: transactionsResult.data?.[0] || null,
-        category: categoriesResult.data?.[0] || null,
-        card: cardsResult.data?.[0] || null
-      }
-    })
-
     // Verificar se há erros nas consultas
-    if (usersResult.error) {
-      console.error('❌ Erro ao buscar usuários:', usersResult.error)
-    }
-    if (transactionsResult.error) {
-      console.error('❌ Erro ao buscar transações:', transactionsResult.error)
-    }
-    if (categoriesResult.error) {
-      console.error('❌ Erro ao buscar categorias:', categoriesResult.error)
-    }
-    if (cardsResult.error) {
-      console.error('❌ Erro ao buscar cartões:', cardsResult.error)
+
+    if (usersResult.error || transactionsResult.error || categoriesResult.error || cardsResult.error) {
+      return NextResponse.json({ error: 'Erro ao buscar dados do sistema' }, { status: 500 })
     }
 
     // Calcular estatísticas
@@ -129,7 +98,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log('✅ Estatísticas calculadas:', stats)
+
 
     return NextResponse.json({
       success: true,
@@ -142,10 +111,9 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Erro na API de estatísticas admin:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }
-} 
+}

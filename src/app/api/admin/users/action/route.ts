@@ -68,12 +68,6 @@ export async function POST(request: NextRequest) {
         // Conceder acesso premium gratuito
         const premiumUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 ano
         
-        console.log('🔄 Tentando conceder premium para:', {
-          userId,
-          targetUser: userEmail,
-          premiumUntil: premiumUntil.toISOString()
-        })
-        
         const { data: updateData, error: grantError } = await supabaseAdmin
           .from('profiles')
           .update({ 
@@ -84,30 +78,19 @@ export async function POST(request: NextRequest) {
           .eq('id', userId)
           .select()
 
-        console.log('📊 Resultado do update:', { updateData, grantError })
-
         if (grantError) {
-          console.error('❌ Erro ao conceder premium:', grantError)
           return NextResponse.json({ error: 'Erro ao conceder premium', details: grantError }, { status: 500 })
         }
 
         if (!updateData || updateData.length === 0) {
-          console.error('⚠️ Nenhuma linha foi atualizada. Usuário não encontrado ou sem permissão.')
           return NextResponse.json({ error: 'Usuário não encontrado ou sem permissão para atualizar' }, { status: 404 })
         }
-
-        console.log('✅ Premium concedido com sucesso!')
         result = { premium: true, until: premiumUntil.toISOString() }
         message = `Usuário ${targetUser.username} recebeu acesso premium gratuito por 1 ano`
         break
 
       case 'revoke_premium':
         // Remover acesso premium
-        console.log('🔄 Tentando remover premium de:', {
-          userId,
-          targetUser: userEmail
-        })
-        
         const { data: revokeData, error: revokeError } = await supabaseAdmin
           .from('profiles')
           .update({ 
@@ -118,19 +101,13 @@ export async function POST(request: NextRequest) {
           .eq('id', userId)
           .select()
 
-        console.log('📊 Resultado da remoção:', { revokeData, revokeError })
-
         if (revokeError) {
-          console.error('❌ Erro ao remover premium:', revokeError)
           return NextResponse.json({ error: 'Erro ao remover premium', details: revokeError }, { status: 500 })
         }
 
         if (!revokeData || revokeData.length === 0) {
-          console.error('⚠️ Nenhuma linha foi atualizada na remoção. Usuário não encontrado.')
           return NextResponse.json({ error: 'Usuário não encontrado para remoção de premium' }, { status: 404 })
         }
-
-        console.log('✅ Premium removido com sucesso!')
         result = { premium: false }
         message = `Acesso premium removido do usuário ${targetUser.username}`
         break
@@ -139,8 +116,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Ação não suportada' }, { status: 400 })
     }
 
-    // Log da ação administrativa
-    console.log(`Admin ${user.email} executou ação "${action}" no usuário ${userEmail}`)
+
 
     return NextResponse.json({
       success: true,
@@ -154,10 +130,9 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de ações de usuário:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }
-} 
+}

@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Email do usuário não encontrado' }, { status: 404 })
 
   } catch (error) {
-    console.error('Erro ao buscar usuário:', error)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
   }
-} 
+}

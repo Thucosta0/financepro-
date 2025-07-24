@@ -93,7 +93,7 @@ export default function OrcamentoPage() {
         throw new Error('Erro ao gerar dica')
       }
     } catch (error) {
-      console.error('Erro ao gerar dica da IA:', error)
+      // Silenciar erro da IA
       // Dica padrão em caso de erro
       setAiTip({
         titulo: "💡 Dica Financeira",
@@ -156,7 +156,7 @@ export default function OrcamentoPage() {
       try {
         await deleteBudget(budgetId)
       } catch (error) {
-        console.error('Erro ao excluir orçamento:', error)
+        // Silenciar erro de exclusão
         alert('Erro ao excluir orçamento. Tente novamente.')
       }
     }

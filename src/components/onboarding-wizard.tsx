@@ -77,8 +77,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
       onComplete()
     } catch (error) {
-      console.error('Erro ao criar categorias:', error)
-      alert('Erro ao criar categorias. Tente novamente.')
+      alert('Erro ao criar categorias padrão. Tente novamente.')
     } finally {
       setIsCreating(false)
     }
@@ -192,7 +191,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       <div className="text-xl sm:text-2xl mb-1">{category.icon}</div>
                       <div className="text-xs sm:text-sm font-medium leading-tight">{category.name}</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {category.type === 'income' ? 'Receita' : 'Despesa'}
+                        {(category.type as string) === 'income' ? 'Receita' : 'Despesa'}
                       </div>
                       {isSelected && (
                         <Check className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 mx-auto mt-1" />
@@ -224,7 +223,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       <div className="text-xl sm:text-2xl mb-1">{category.icon}</div>
                       <div className="text-xs sm:text-sm font-medium leading-tight">{category.name}</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {category.type === 'income' ? 'Receita' : 'Despesa'}
+                        {(category.type as string) === 'income' ? 'Receita' : 'Despesa'}
                       </div>
                       {isSelected && (
                         <Check className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 mx-auto mt-1" />
@@ -256,7 +255,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       <div className="text-xl sm:text-2xl mb-1">{category.icon}</div>
                       <div className="text-xs sm:text-sm font-medium leading-tight">{category.name}</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {category.type === 'income' ? 'Receita' : 'Despesa'}
+                        {(category.type as string) === 'income' ? 'Receita' : 'Despesa'}
                       </div>
                       {isSelected && (
                         <Check className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 mx-auto mt-1" />
@@ -357,4 +356,4 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       </Card>
     </div>
   )
-} 
+}

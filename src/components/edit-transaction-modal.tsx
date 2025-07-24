@@ -12,7 +12,7 @@ interface EditTransactionModalProps {
 }
 
 export function EditTransactionModal({ isOpen, onClose, transaction }: EditTransactionModalProps) {
-  const { updateTransaction, categories, cards } = useFinancial()
+  const { updateTransaction, categories, cards, refreshTransactions } = useFinancial()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     description: '',
@@ -63,9 +63,12 @@ export function EditTransactionModal({ isOpen, onClose, transaction }: EditTrans
       }
 
       await updateTransaction(transaction.id, updatedTransaction)
+      
+      // Atualizar a lista de transações
+      await refreshTransactions()
+      
       onClose()
     } catch (error) {
-      console.error('Erro ao atualizar transação:', error)
       alert('Erro ao atualizar transação. Tente novamente.')
     } finally {
       setIsLoading(false)
@@ -298,4 +301,4 @@ export function EditTransactionModal({ isOpen, onClose, transaction }: EditTrans
       </div>
     </div>
   )
-} 
+}

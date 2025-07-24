@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       const data = await response.json()
       
       if (!response.ok) {
-        console.error('Gemini API error:', data)
+        // Silenciar erro de API do Gemini
         return NextResponse.json({ response: `Erro Gemini: ${data.error?.message || JSON.stringify(data)}` })
       }
       
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
     
     if (!response.ok) {
-      console.error('Gemini API error:', data)
+      // Silenciar erro de API do Gemini
       return NextResponse.json({ response: `Erro Gemini: ${data.error?.message || JSON.stringify(data)}` })
     }
     
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ response: resposta })
 
   } catch (error) {
-    console.error('Erro na API do assistente IA:', error)
+    // Silenciar erro da API do assistente IA
     const fallbackResponse = `Desculpe, estou temporariamente indisponível. 😔 \n\nEnquanto isso, aqui estão algumas dicas rápidas:\n• Use a regra 50-30-20 para seu orçamento\n• Mantenha uma reserva de emergência de 6 meses\n• Quite primeiro as dívidas com juros mais altos\n• Monitore seus gastos semanalmente\n\nTente novamente em alguns instantes!`
     return NextResponse.json({ response: fallbackResponse })
   }

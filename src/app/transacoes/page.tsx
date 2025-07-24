@@ -49,8 +49,18 @@ export default function TransacoesPage() {
     updateTransaction,
     loadMoreTransactions,
     hasMoreTransactions,
-    transactionsLoading
+    transactionsLoading,
+    refreshTransactions
   } = useFinancial()
+  
+  // Debug: verificar estado das transações
+  console.log('🔍 [TRANSAÇÕES DEBUG] Estado atual:', {
+    transactionsCount: transactions.length,
+    transactionsLoading,
+    hasMoreTransactions,
+    cardsCount: cards.length,
+    categoriesCount: categories.length
+  })
   const { canCreateTransaction } = useTransactionPrerequisites()
   const { canPerformAction, isTrialExpired } = useSubscription()
 
@@ -151,11 +161,14 @@ export default function TransacoesPage() {
       
       await updateTransaction(transaction.id, updatedTransaction)
       
+      // Atualizar a lista de transações
+      await refreshTransactions()
+      
       // Mostrar feedback personalizado
       alert(mensagem)
     } catch (error) {
-      console.error('Erro ao atualizar status da transação:', error)
-      alert('Erro ao atualizar transação. Tente novamente.')
+      // Silenciar erro de atualização
+       alert('Erro ao atualizar transação. Tente novamente.')
     }
   }
 
@@ -202,12 +215,16 @@ export default function TransacoesPage() {
       try {
         const deletePromises = Array.from(selectedTransactions).map(id => deleteTransaction(id))
         await Promise.all(deletePromises)
+        
+        // Atualizar a lista de transações
+        await refreshTransactions()
+        
         setSelectedTransactions(new Set())
         setIsSelectMode(false)
         alert(`${selectedTransactions.size} transação(ões) excluída(s) com sucesso!`)
       } catch (error) {
-        console.error('Erro ao excluir transações:', error)
-        alert('Erro ao excluir algumas transações. Tente novamente.')
+      // Silenciar erro de exclusão
+         alert('Erro ao excluir algumas transações. Tente novamente.')
       }
     }
   }
@@ -265,14 +282,18 @@ export default function TransacoesPage() {
         return Promise.resolve()
       })
       await Promise.all(updatePromises)
+      
+      // Atualizar a lista de transações
+      await refreshTransactions()
+      
       setSelectedTransactions(new Set())
       setIsSelectMode(false)
       
       // Mostrar mensagem personalizada
       alert(mensagem)
     } catch (error) {
-      console.error('Erro ao finalizar transações:', error)
-      alert('Erro ao finalizar algumas transações. Tente novamente.')
+      // Silenciar erro de finalização
+       alert('Erro ao finalizar algumas transações. Tente novamente.')
     }
   }
 
@@ -506,8 +527,8 @@ export default function TransacoesPage() {
       try {
         await deleteTransaction(transactionId)
       } catch (error) {
-        console.error('Erro ao excluir transação:', error)
-        alert('Erro ao excluir transação. Tente novamente.')
+      // Silenciar erro de exclusão
+         alert('Erro ao excluir transação. Tente novamente.')
       }
     }
   }

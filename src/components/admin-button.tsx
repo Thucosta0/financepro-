@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shield, Settings, Users, Database, BarChart3, X, RefreshCw } from 'lucide-react'
+import { Shield, Settings, Users, Database, BarChart3, X, RefreshCw, Trash2 } from 'lucide-react'
 import { useAdmin } from '@/hooks/use-admin'
 import { useAuth } from '@/context/auth-context'
 import { AdminUserManagement } from './admin-user-management'
+import { AdminResetTransactions } from './admin-reset-transactions'
 import { usePathname } from 'next/navigation'
 
 interface AdminStats {
@@ -45,7 +46,7 @@ export function AdminButton() {
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
-  const [currentView, setCurrentView] = useState<'dashboard' | 'users' | 'database' | 'analytics' | 'settings'>('dashboard')
+  const [currentView, setCurrentView] = useState<'dashboard' | 'users' | 'database' | 'analytics' | 'settings' | 'reset-transactions'>('dashboard')
   
   // Páginas onde o Admin Button NÃO deve aparecer
   const excludedPages = [
@@ -79,7 +80,7 @@ export function AdminButton() {
         setStats(data.stats)
       }
     } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error)
+      // Erro silencioso ao carregar estatísticas
     } finally {
       setLoadingStats(false)
     }
@@ -111,6 +112,8 @@ export function AdminButton() {
     switch (currentView) {
       case 'users':
         return <AdminUserManagement onBack={() => setCurrentView('dashboard')} />
+      case 'reset-transactions':
+        return <AdminResetTransactions onBack={() => setCurrentView('dashboard')} />
       case 'database':
         return (
           <div className="space-y-4">
@@ -317,6 +320,17 @@ export function AdminButton() {
             <div>
               <p className="font-medium text-gray-900">Configurações</p>
               <p className="text-xs text-gray-600">Configurações do sistema</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setCurrentView('reset-transactions')}
+            className="flex items-center space-x-3 p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors text-left"
+          >
+            <Trash2 className="h-6 w-6 text-red-600" />
+            <div>
+              <p className="font-medium text-gray-900">Reset Transações</p>
+              <p className="text-xs text-gray-600">Limpar dados de usuários</p>
             </div>
           </button>
         </div>
