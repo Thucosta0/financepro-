@@ -1,0 +1,35 @@
+
+version: '3.8'
+
+services:
+  financepro:
+    container_name: financepro-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.local
+    networks:
+      - finance-network
+
+  # Serviço de Túnel para Acesso Externo (ngrok)
+  ngrok:
+    container_name: financepro-ngrok
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command: http financepro-app:3000
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      - financepro
+    networks:
+      - finance-network
+
+networks:
+  finance-network:
+    driver: bridge
